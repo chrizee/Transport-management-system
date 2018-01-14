@@ -127,7 +127,11 @@
 		            		
 		            	?>
 		                <tr>
-		                  <td class="plate_no"><?php echo $value->plate_no ?></td>
+		                	<?php if($user->hasPermission('admin') || $user->hasPermission('manager')) {?>
+		                  <td class="plate_no" title="view complete details and history of maintenance"><a href="vehicle.php?vehicle=<?php echo encode($value->id)?>"><?php echo $value->plate_no ?></a></td>
+		                  <?php } else {?>
+		                  	<td class="plate_no"><?php echo $value->plate_no ?></td>
+		                  	<?php } ?>
 		                  <td class="seat_no"><?php echo $value->no_of_seats ?></td>
 		                  <td class="ac"><?php echo ($value->ac ==0) ? "No" : "Yes" ?></td>
 		                  <td class="model"><?php echo $value->model ?></td>
@@ -160,7 +164,7 @@
 		                 	<?php
 								    		if($user->hasPermission('admin') || $user->hasPermission('manager')) {
 								    	?>
-		                 	<td><button class="btn btn-info edit" data-toggle="modal" name="<?php echo $value->id;?>" data-target="#vehicles">Edit</button></td>
+		                 	<td><button title="edit mistakes made during creation" class="btn btn-info edit" data-toggle="modal" name="<?php echo $value->id;?>" data-target="#vehicles">Edit</button></td>
 		                 	<?php } ?>
 		                </tr>
 		              <?php } ?>
@@ -244,7 +248,7 @@
 		                
 			              <div class="modal-footer">
 			                <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
-			                <input type="submit" class="btn btn-primary" name="editvehicle" value="Save changes">
+			                <input type="submit" class="btn btn-sm btn-primary" name="editvehicle" value="Save changes">
 			              </div>
 			            </form>
 		            </div>

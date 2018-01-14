@@ -241,7 +241,7 @@
 <!-- AdminLTE dashboard demo (This is only for demo purposes) -->
 <script src="dist/js/pages/dashboard.js"></script>
 <!-- AdminLTE for demo purposes -->
-<script src="dist/js/dem.js"></script>
+<script src="dist/js/demo.js"></script>
 <!-- InputMask -->
 <script src="plugins/input-mask/jquery.inputmask.js"></script>
 <script src="plugins/input-mask/jquery.inputmask.date.extensions.js"></script>
@@ -249,6 +249,11 @@
 <!-- iCheck -->
 <script src="plugins/iCheck/icheck.min.js"></script>
 <script>
+  $('button').each(function() {
+    if(!($(this).hasClass('btn-sm'))) {
+      $(this).addClass('btn-sm');
+    }
+  });
 //Datemask dd/mm/yyyy
     //$("#datemask").inputmask("dd/mm/yyyy", {"placeholder": "dd/mm/yyyy"});
     //Money Euro

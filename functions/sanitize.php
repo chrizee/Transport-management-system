@@ -34,9 +34,11 @@ function timeToStamp($time) {
 	}
 	return false;
 }
+$key = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_-=+;:,.?";
 function encode($data) {
-	return base64_encode($data);
+	global $key;
+	return base64_encode($data."::".$key);
 }
 function decode($data) {
-	return base64_decode($data);
+	return explode("::", base64_decode($data), 2)[0];
 }

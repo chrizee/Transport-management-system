@@ -46,5 +46,3 @@
 			echo "X";	//no price failure
 		}
 	}
-	
-?>

@@ -7,10 +7,10 @@ class Travels extends Action{
 	public function __construct($table) {
 		$this->_table = $table;
 	}
-
+	
 	public function calcpercent($routeid, Route $routeObj, $starttime, $id ) {
 		$date = new DateTime($starttime);		//time journey started
-		$initstamp = strtotime($date->format('H:i:s'));	
+		$initstamp = strtotime($date->format('H:i:s'));
 		if($routeid != 0) {
 			$this->duration = $routeObj->get(array('id', '=', $routeid), 'duration')[0]->duration;
 			if($this->duration != "00:00:00") {

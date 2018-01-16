@@ -13,10 +13,10 @@
   }
   if(!empty($user->getMeta()->results())) $meta = $user->getMeta()->first();
   $notification = new Notification();
-  $notice = $notification->getN($user->data()->groups, $user->data()->location);
+  $notice = array_reverse($notification->getN($user->data()->groups, $user->data()->location));
   $count = 0 ;   //stores no of unseen notification
   foreach($notice as $key => $value) {
-    if($value->status == 0) {
+    if($value->status == 0 && weekCheck($value->date)) {   //any notification more than a week is no longer new
       $count++;
     }
   }
@@ -114,7 +114,7 @@
                   <li><!-- start message -->
                     <a href="<?php echo $notification->links[$value->category]; ?>">
                       <div class="pull-left">
-                        <img src="<?php 
+                        <img src="<?php
                         $userNotice = new User($value->initiated);
                         $n = $userNotice->getMeta()->first();
                         echo (empty($n->pic_src)) ? 'img/avatar-male.png' : "img/{$n->pic_src}"?>" class="img-circle" alt="User Image">
@@ -123,7 +123,7 @@
                         <?php echo $notification->headers[$value->category]?>
                         <small><i class="fa fa-clock-o"></i> <?php echo  $notification->date($value->date);?></small>
                       </h4>
-                      <p> <?php echo $notification->message[$value->category]?></p>
+                      <p> <?php echo (empty($notification->message[$value->category]))? $value->message : $notification->message[$value->category]?></p>
                     </a>
                   </li>
                   <?php } ?>
@@ -380,7 +380,7 @@
             </span>
           </a>
         </li>
-        <?php 
+        <?php
           if($user->hasPermission('admin') || $user->hasPermission('manager')) { ?>
             <li class="treeview">
               <a href="#">
@@ -407,7 +407,7 @@
             <i class="fa fa-dashboard"></i> <span>Logout</span>
           </a>
         </li>
-       
+
       </ul>
     </section>
     <!-- /.sidebar -->

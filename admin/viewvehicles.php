@@ -1,4 +1,4 @@
-<?php 
+<?php
 	require_once 'includes/content/header.php';
 	if(!$user->checkPermission(array('*'))) {    //all can see it
 	    Session::flash('home', "You don't have permission to view that page");
@@ -44,7 +44,7 @@
 					'status' => Input::get('current_state'),
 					));
 					Session::flash('home', "Vehicle updated successfully");
-					Redirect::to($_SERVER['PHP_SELF']);	
+					Redirect::to($_SERVER['PHP_SELF']);
 			} catch (Exception $e) {
 				print_r($e->getMessage());
 			}
@@ -52,10 +52,10 @@
 			foreach ($validation->errors() as $error) {
 				$errors[] = $error;
 			}
-		}	
+		}
 	}
 ?>
-	
+
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper">
     <!-- Content Header (Page header) -->
@@ -122,9 +122,8 @@
 		                </tr>
 		              </thead>
 		            	<tbody>
-		            	<?php 
+		            	<?php
 		            		foreach ($vehicleInfo as $key => $value) {
-		            		
 		            	?>
 		                <tr>
 		                	<?php if($user->hasPermission('admin') || $user->hasPermission('manager')) {?>
@@ -137,7 +136,7 @@
 		                  <td class="model"><?php echo $value->model ?></td>
 		                  <td class="brand"><?php echo $value->brand ?></td>
 		                  <td><?php echo $value->date_created ?></td>
-		                  <td class="status"><?php 
+		                  <td class="status"><?php
 			                  switch ($value->status) {
 			                  	case Config::get('status/out'):
 			                  		echo "Out";
@@ -157,8 +156,8 @@
 			                  	default:
 			                  		echo "Undefined";
 			                  		break;
-			                  } 
-		                  	?> 
+			                  }
+		                  	?>
 		                 	</td>
 		                 	<td><?php echo $parkObj->get($value->current_location, 'park')->park; ?></td>
 		                 	<?php
@@ -171,7 +170,7 @@
 		            </tbody>
 		          </table>
 		        </div>
-					</div>  
+					</div>
 
 					<div class="example-modal">
 		        <div id="vehicles" class="modal fade" role="dialog">
@@ -245,7 +244,7 @@
 		                		<option value="<?php echo Config::get('status/out'); ?>">Out</option>
 			                </select>
 			            	</div>
-		                
+
 			              <div class="modal-footer">
 			                <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
 			                <input type="submit" class="btn btn-sm btn-primary" name="editvehicle" value="Save changes">
@@ -260,7 +259,7 @@
 		    	</div>
         </section>
         <!-- /.Left col -->
-      	
+
       </div>
       <!-- /.row (main row) -->
     </section>
@@ -298,6 +297,6 @@
  		});
  	})
 </script>
-<?php } 
+<?php }
 	require_once 'includes/content/footer.php';
 ?>

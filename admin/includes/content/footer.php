@@ -140,7 +140,6 @@
             </p>
           </div>
           <!-- /.form-group -->
-
           <div class="form-group">
             <label class="control-sidebar-subheading">
               Allow mail redirect

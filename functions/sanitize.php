@@ -2,27 +2,36 @@
 function escape($string) {
 	return htmlentities($string, ENT_QUOTES, 'UTF-8');
 }
-//produces yyyy-mm-dd HH:MM from mm/dd/yyyy HH:MM AM/PM 
+//produces yyyy-mm-dd HH:MM from mm/dd/yyyy HH:MM AM/PM
 function cleanDate($datetime) {
 	$arr = explode(' ', $datetime);
 	$date = explode('/', $arr[0]);
 	$time = explode(':', $arr[1]);
 	$timestr = $arr[2];
 	$ndate = $date[2].'-'.$date[0].'-'.$date[1];
-	
+
 	$hh = $time[0];
 	$mm = $time[1];
 
-	
+
 	if($timestr == 'am' || $timestr == 'AM') {
 		$pad = 0;
 	} else {
 		$pad = 12;
 	}
 	$hh += $pad;
-	$ntime = $hh.':'.$mm; 
+	$ntime = $hh.':'.$mm;
 	$newDatetime = $ndate.' '.$ntime;
 	return $newDatetime;
+}
+function weekCheck($date) {
+	$init = new dateTime($date);
+	$now = new dateTime();
+	$diff = $now->diff($init);
+	if($diff->format("%d") >= 7) {
+		return false;
+	}
+	return true;
 }
 function timeToStamp($time) {
 	$arr = explode(':', $time);

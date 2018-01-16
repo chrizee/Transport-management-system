@@ -15,7 +15,7 @@
 	}
 	//inserting in routes
 	if(empty(Input::get('id'))) {
-		if(!empty(Input::get('price'))) {		
+		if(!empty(Input::get('price'))) {
 			$route = new Route('routes');
 				if(!empty(Input::get('duration'))) {
 					//echo 'a';
@@ -41,7 +41,7 @@
 					} catch (Exception $e) {
 						print_r($e->getMessage());
 					}
-				}	
+				}
 		} else {
 			echo "X";	//no price failure
 		}

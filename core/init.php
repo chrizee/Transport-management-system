@@ -16,7 +16,7 @@ $GLOBALS['config'] = array(
 	'session' => array(
 		'session_admin' => 'admin',
 		'session_staff' => 'staff',
-		'load' => 'passengers', 
+		'load' => 'passengers',
 		'token_name' => 'token'
 	),
 	'cookie' => array(
@@ -31,15 +31,15 @@ $GLOBALS['config'] = array(
 		'active' => 1,
 		'leave' => 2,
 		'sick' => 3,
-		'good' => 1,	//vehicle	
-		'faulty' => 2,	
+		'good' => 1,	//vehicle
+		'faulty' => 2,
 		'out' => 'X',
 		'selected' => 4,
 		'travelling' => 5,
 		'travels' => array(
 			'travelling' => 0,
 			'arrived' => 1
-			),	
+			),
 	),
 	'waybill' => array(
 		'placed' => 0,
@@ -57,6 +57,7 @@ $GLOBALS['config'] = array(
 		'manager' => 3,
 		'waybill' => 4,
 		'ceo' => 2,
+		'all' => '*',
 	),
 	'message' => array(
 		'not_read' => 0,
@@ -69,7 +70,9 @@ $GLOBALS['config'] = array(
 			'responded' => 2,
 			),
 		'request_vehicle' => 1,
-		
+		'vehicle_bad' => 2,
+		'vehicle_back' => 3,
+
 	),
 );
 
@@ -85,11 +88,11 @@ require_once '../functions/sanitize.php'; //includes the function file
 		$hash = Cookie::get(Config::get('cookie/remember'));
 		//check if that hash exists in the database and grabs it from there
 		$hashCheck = DB::getInstance()->get('users_session', array('hash', '=', $hash));
-		
+
 		if($hashCheck->count()) {
 			$user = new User($hashCheck->first()->user_id);
 			$user->login();
 		}
 	}
-	
+
 ?>

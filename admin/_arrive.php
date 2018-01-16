@@ -3,6 +3,7 @@
 	if(!empty(Input::get('tripid'))) {
 		$travelObj = new Travels('travels');
 		try {
+		    new PDOStatement()
 			$travel = $travelObj->get(array('id', '=', Input::get('tripid')));
 			$user = new User();
 			if(!empty($travel)) {

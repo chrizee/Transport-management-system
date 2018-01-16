@@ -72,6 +72,11 @@ $GLOBALS['config'] = array(
 		'request_vehicle' => 1,
 		'vehicle_bad' => 2,
 		'vehicle_back' => 3,
+		'location_add' => 4,
+		'staff_add' => 5,
+		'driver_add' => 6,
+		'vehicle_add' => 7,
+		'price_update' => 8,
 
 	),
 );

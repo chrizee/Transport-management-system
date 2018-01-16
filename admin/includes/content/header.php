@@ -112,7 +112,7 @@
                 <ul class="menu">
                   <?php foreach ($notice as $key => $value) { ?>
                   <li><!-- start message -->
-                    <a href="<?php echo $notification->links[$value->category]; ?>">
+                    <a href="<?php echo $notification->links[$value->category].'.php'; ?>">
                       <div class="pull-left">
                         <img src="<?php
                         $userNotice = new User($value->initiated);

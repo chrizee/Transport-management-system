@@ -1,4 +1,4 @@
-<?php 
+<?php
 	require_once 'includes/content/header.php';
 	if(!$user->checkPermission(array('manager', 'admin'))) {    //only ceo and manager can see it
 	    Session::flash('home', "You don't have permission to view that page");
@@ -6,6 +6,7 @@
 	}
 	$park = $parkObj->get();
 	$errors = array();
+	//$notice = new Notification();
 	if(Input::exists()) {
 		if(Input::get('staff')) {
 			$validate = new Validate();
@@ -55,8 +56,17 @@
 						'location' => Input::get('location'),
 						'groups' => Input::get('role')
 						));
+						$location =  $parkObj->get(Input::get('location'), 'park')->park;
+						$notification->create(array(
+							'message' => Input::get('name')." is now a staff at " .$location,
+							'initiated' => $user->data()->id,
+							'location_initiated' => $user->data()->location,
+							'affected' => Config::get('permissions/all'),
+							'location_affected' => Config::get('permissions/all'),
+							'category' => Config::get('notification/staff_add'),
+							));
 						Session::flash('home', "Staff created successfully");
-						Redirect::to('createstaff.php');	
+						Redirect::to('createstaff.php');
 				} catch (Exception $e) {
 					print_r($e->getMessage());
 				}
@@ -87,7 +97,7 @@
 					),
 				));
 
-			if($validation->passed()) { 
+			if($validation->passed()) {
 
 				try {
 					$driver = new Driver('drivers');
@@ -96,7 +106,15 @@
 						'email' => Input::get('email'),
 						'phone' => Input::get('phone'),
 						'current_location' => Input::get('current_location'),
-						));	
+						));
+						$notification->create(array(
+							'message' => Input::get('name')." is now a driver",
+							'initiated' => $user->data()->id,
+							'location_initiated' => $user->data()->location,
+							'affected' => Config::get('permissions/all'),
+							'location_affected' => Config::get('permissions/all'),
+							'category' => Config::get('notification/driver_add'),
+							));
 					Session::flash('home', "Driver created successfully");
 					Redirect::to('createstaff.php');
 				} catch (Exception $e) {
@@ -104,13 +122,13 @@
 				}
 			} else {
 				foreach ($validation->errors() as $error) {
-					$errors[] = $error;	
+					$errors[] = $error;
 				}
 			}
 		}
 	}
 ?>
-	
+
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper">
     <!-- Content Header (Page header) -->
@@ -131,14 +149,16 @@
 
     <!-- Main content -->
     <section class="content">
-      
+			<div style="display:inline-block;">
+      	<a href="viewstaff.php"><button class="btn btn-sm btn-success pull-right">View staffs <i class="fa fa-link"></i></button></a>
+      </div>
       <!-- Main row -->
       <div class="row">
         <!-- Left col -->
         <section class="col-lg-5 connectedSortable">
 			<div class="box box-success">
 				<div class="box-header with-border">
-	              <h3 class="box-title">Select category to create</h3>
+	              <h3 class="box-title">Select category to add</h3>
 	            	<div class="pull-right box-tools">
 		                <button type="button" class="btn btn-info btn-sm" data-widget="collapse" data-toggle="tooltip" title="Collapse">
 		                  <i class="fa fa-minus"></i></button>
@@ -151,14 +171,14 @@
 		                <div class="form-group">
 		                  <label></label>
 		                  <select class="form-control" name="staff" required>
-							<option value="">--Select--</option>
-							<option value="driver">Driver</option>
-							<option value="staff">Staff</option>
+												<option value="">--Select--</option>
+												<option value="driver">Driver</option>
+												<option value="staff">Staff</option>
 		                  </select>
 		                </div>
 		            </form>
 	            </div>
-			</div> 
+			</div>
         </section>
         <!-- /.Left col -->
         <!-- right col (We are only adding the ID to make the widgets sortable)-->
@@ -191,7 +211,7 @@
 	                  <div class="input-group">
 		                  <input type="text" class="form-control" id="staffname" name="name" value="<?php echo escape(Input::get('name'))?>">
 		                  <div class="input-group-addon">
-			               	<i class="fa fa-database"></i>
+			               	<i class="text-success fa fa-user"></i>
 			               </div>
 			          </div>
 	                </div>
@@ -201,7 +221,7 @@
 	                  <div class="input-group">
 		                  <input type="email" class="form-control" id="email" name="email" value="<?php echo escape(Input::get('email'))?>">
 		                  <div class="input-group-addon">
-			               	<i class="fa fa-database"></i>
+			               	<i class="text-success fa fa-envelope"></i>
 			               </div>
 			          </div>
 	                </div>
@@ -211,7 +231,7 @@
 	                  <div class="input-group">
 		                  <input type="password" class="form-control" id="password1" name="password1" value="<?php echo escape(Input::get('password1'))?>">
 		                  <div class="input-group-addon">
-			               	<i class="fa fa-database"></i>
+			               	<i class="text-success fa fa-lock"></i>
 			               </div>
 			          </div>
 	                </div>
@@ -221,7 +241,7 @@
 	                  <div class="input-group">
 		                  <input type="password" class="form-control" id="password2" name="password2" value="<?php echo escape(Input::get('password2'))?>">
 		                  <div class="input-group-addon">
-			               	<i class="fa fa-database"></i>
+			               	<i class="text-success fa fa-lock"></i>
 			               </div>
 			          </div>
 	                </div>
@@ -231,7 +251,7 @@
 	                  <div class="input-group">
 		                  <input type="tel" class="form-control" id="phone" name="phone" value="<?php echo escape(Input::get('phone'))?>">
 		                  <div class="input-group-addon">
-			               	<i class="fa fa-database"></i>
+			               	<i class="text-success fa fa-phone"></i>
 			               </div>
 			          </div>
 	                </div>
@@ -241,7 +261,7 @@
 	                  <div class="input-group">
 		                  <input type="address" class="form-control" id="address" name="address" value="<?php echo escape(Input::get('address'))?>">
 		                  <div class="input-group-addon">
-			               	<i class="fa fa-database"></i>
+			               	<i class="text-success fa fa-building"></i>
 			               </div>
 			          </div>
 	                </div>
@@ -271,7 +291,7 @@
 		                  		<?php }?>
 		                </select>
 		            </div>
-		            
+
 	                <div class="form-group">
 		                <label>Gender &nbsp;</label>
 		                <label>
@@ -296,7 +316,7 @@
 	                  <div class="input-group">
 		                  <input type="text" class="form-control" id="drivername" name="name" value="<?php echo escape(Input::get('name'))?>">
 		                  <div class="input-group-addon">
-			               	<i class="fa fa-database"></i>
+			               	<i class="text-success fa fa-user"></i>
 			               </div>
 			          </div>
 	                </div>
@@ -306,7 +326,7 @@
 	                  <div class="input-group">
 		                  <input type="email" class="form-control" id="driveremail" name="email" value="<?php echo escape(Input::get('email'))?>">
 		                  <div class="input-group-addon">
-			               	<i class="fa fa-database"></i>
+			               	<i class="text-success fa fa-envelope"></i>
 			               </div>
 			          </div>
 	                </div>
@@ -316,7 +336,7 @@
 	                  <div class="input-group">
 		                  <input type="tel" class="form-control" id="driverphone" name="phone" value="<?php echo escape(Input::get('phone'))?>">
 		                  <div class="input-group-addon">
-			               	<i class="fa fa-database"></i>
+			               	<i class="text-success fa fa-phone"></i>
 			               </div>
 			          </div>
 	                </div>
@@ -327,7 +347,7 @@
 		                  <option value="">--select--</option>
 		                  <?php
 		                  	foreach ($park as $value) { ?>
-		                  		<option value="<?php echo $value->id; ?>"><?php echo $value->park; ?></option>
+		                  		<option value="<?php echo $value->id; ?>" <?php if($user->data()->location == $value->id) echo "selected='selected'"?>><?php echo $value->park; ?></option>
 		                  	<?php } ?>
 		                </select>
 		            </div>
@@ -340,7 +360,7 @@
 	              </div>
 	            </form>
           	</div>
-          <!-- /.box -->     
+          <!-- /.box -->
         </section>
         <!-- right col -->
       </div>
@@ -362,7 +382,7 @@
  				$('form#staff').addClass('hidden');
  				$('div.big').removeClass('hidden');
  				$('form#driver').removeClass('hidden');
- 			} 
+ 			}
  			if($('select[name=staff]').val() == 'staff') {
  				$('div.big').find('h3.box-title').text("Staff Info");
  				$('form#driver').addClass('hidden');
@@ -372,7 +392,7 @@
  		});
  	});
 
- </script> 
-<?php 
+ </script>
+<?php
 	require_once 'includes/content/footer.php';
 ?>

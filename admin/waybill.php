@@ -1,4 +1,4 @@
-<?php 
+<?php
 	require_once 'includes/content/header.php';
 	if(!$user->checkPermission(array('staff'), false)) {		//only staff cannot see it
 		Session::flash('home', "You don't have permission to view that page");
@@ -74,7 +74,7 @@
 					'spy_key' => $pass,
 					));
 					Session::flash('home', "Waybill added successfully");
-					Redirect::to($_SERVER['PHP_SELF']);	
+					Redirect::to($_SERVER['PHP_SELF']);
 			} catch (Exception $e) {
 				print_r($e->getMessage());
 			}
@@ -82,17 +82,17 @@
 			foreach ($validation->errors() as $error) {
 				$errors[] = $error;
 			}
-		}	
+		}
 	}
 ?>
-	
+
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper">
     <!-- Content Header (Page header) -->
     <section class="content-header">
       <h1>
         <?php echo $parkObj->get($user->data()->location, 'park')->park; ?>
-        <small>Waybills send code to reciever to use in claiming the item</small>
+        <small>Waybills send code to receiver to use in claiming the item</small>
       </h1>
       <?php if(Session::exists('home')) {
 		        echo "<p class='text text-center text-danger'>".Session::flash('home')."</p>";
@@ -111,7 +111,7 @@
 
     <!-- Main content -->
     <section class="content">
-    <?php 
+    <?php
     	if($user->hasPermission('waybill')) {
     ?>
       <div style="display:inline-block;">
@@ -121,6 +121,9 @@
       <!-- Main row -->
       <div class="row">
         <!-- Left col -->
+				<?php
+		    	if($user->hasPermission('waybill')) {
+		    ?>
         <section class="col-lg-5 connectedSortable hidden">
 					<div class="box box-success">
 						<div class="box-header with-border">
@@ -139,7 +142,7 @@
 				                  <div class="input-group">
 					                  <input type="text" class="form-control" id="sender_name" name="sender_name" value="<?php echo escape(Input::get('sender_name'))?>" required autofocus="on">
 					                  <div class="input-group-addon">
-						               	<i class="fa fa-database"></i>
+						               	<i class="fa fa-user"></i>
 						               </div>
 						          </div>
 				                </div>
@@ -149,7 +152,7 @@
 				                  <div class="input-group">
 					                  <input type="text" class="form-control" id="sender_address" name="sender_address" value="<?php echo escape(Input::get('sender_address'))?>" required>
 					                  <div class="input-group-addon">
-						               	<i class="fa fa-database"></i>
+						               	<i class="fa fa-building"></i>
 						               </div>
 						          </div>
 				                </div>
@@ -159,7 +162,7 @@
 				                  <div class="input-group">
 					                  <input type="text" class="form-control" id="sender_phone" name="sender_phone" value="<?php echo escape(Input::get('sender_phone'))?>" required>
 					                  <div class="input-group-addon">
-						               	<i class="fa fa-database"></i>
+						               	<i class="fa fa-phone"></i>
 						               </div>
 						          </div>
 				                </div>
@@ -169,7 +172,7 @@
 				                  <div class="input-group">
 					                  <input type="text" class="form-control" id="receiver_name" name="receiver_name" value="<?php echo escape(Input::get('receiver_name'))?>" required>
 					                  <div class="input-group-addon">
-						               	<i class="fa fa-database"></i>
+						               	<i class="fa fa-user"></i>
 						               </div>
 						          </div>
 				                </div>
@@ -179,7 +182,7 @@
 				                  <div class="input-group">
 					                  <input type="text" class="form-control" id="receiver_address" name="receiver_address" value="<?php echo escape(Input::get('receiver_address'))?>" required>
 					                  <div class="input-group-addon">
-						               	<i class="fa fa-database"></i>
+						               	<i class="fa fa-building-o"></i>
 						               </div>
 						          </div>
 				                </div>
@@ -189,7 +192,7 @@
 				                  <div class="input-group">
 					                  <input type="text" class="form-control" id="receiver_phone" name="receiver_phone" value="<?php echo escape(Input::get('receiver_phone'))?>" required>
 					                  <div class="input-group-addon">
-						               	<i class="fa fa-database"></i>
+						               	<i class="fa fa-phone"></i>
 						               </div>
 						          </div>
 				                </div>
@@ -199,7 +202,7 @@
 				                  <div class="input-group">
 					                  <input type="text" class="form-control" id="item" name="item" value="<?php echo escape(Input::get('item'))?>" required>
 					                  <div class="input-group-addon">
-						               	<i class="fa fa-database"></i>
+						               	<i class="fa fa-diamond"></i>
 						               </div>
 						          </div>
 				                </div>
@@ -209,7 +212,7 @@
 				                  <div class="input-group">
 					                  <input type="text" class="form-control" id="weight" name="weight" value="<?php echo escape(Input::get('weight'))?>" required data-inputmask="'alias': 'decimal'" data-mask>
 					                  <div class="input-group-addon">
-						               	<i class="fa fa-database"></i>
+						               	<i class="fa fa-anchor"></i>
 						               </div>
 						          </div>
 				                </div>
@@ -219,7 +222,7 @@
 					                <select style="text-transform:capitalize;" id="destination" class="form-control select" name="destination" style="width: 100%;" required>
 					                  <option value="">--select--</option>
 					                  <?php
-					                  	foreach ($park as $value) { 
+					                  	foreach ($park as $value) {
 					                  		if($value->id == $user->data()->location) continue; ?>
 					                  		<option value="<?php echo $value->id; ?>"><?php echo $value->park; ?></option>
 					                  	<?php } ?>
@@ -231,17 +234,18 @@
 				                  <div class="input-group">
 					                  <input type="text" class="form-control" id="price" name="price" value="<?php echo escape(Input::get('price'))?>" required data-inputmask="'alias': 'decimal'" data-mask>
 					                  <div class="input-group-addon">
-						               	<i class="fa fa-database"></i>
+						               	<i class="fa fa-exchange"></i>
 						               </div>
 						          </div>
-				                </div>		            
+				                </div>
 			            </div>
 			            <div class="box-footer">
 			                <input type="submit" class="btn btn-primary" name="addwaybill" value="Add Waybill">
 			            </div>
 			            </form>
-					</div> 
+					</div>
         </section>
+			<?php } ?>
         <!-- /.Left col -->
         <!-- right col (We are only adding the ID to make the widgets sortable)-->
         <section class="col-lg-10 connectedSortable">
@@ -260,7 +264,7 @@
 		            <ul class="nav nav-tabs pull-right">
 		              <li class="active"><a href="#incoming-travelling" data-toggle="tab">Travelling</a></li>
 		              <li><a href="#incoming-arrived" data-toggle="tab">Arrived</a></li>
-		              <li><a href="#incoming-in-park" data-toggle="tab">Pick up</a></li>
+		              <li><a href="#incoming-in-park" data-toggle="tab">Availlable for pick up</a></li>
 		              <li class="dropdown">
 		                <a class="dropdown-toggle" data-toggle="dropdown" href="#">
 		                  others <span class="caret"></span>
@@ -270,7 +274,7 @@
 		                  <li role="presentation"><a role="menuitem" data-toggle="tab" tabindex="-1" href="#incoming-picked">Picked Up</a></li>
 		                </ul>
 		              </li>
-		              <li class="pull-left header"><i class="fa fa-th"></i> Incoming</li>
+		              <li class="pull-left header"><i class="fa fa-angle-double-down"></i> Incoming Items</li>
 		            </ul>
 		            <div class="tab-content">
 		            	<div class="tab-pane active" id="incoming-travelling">
@@ -286,7 +290,7 @@
 				                	</tr>
 				                </thead>
 				                <tbody>
-		            	<?php 
+		            	<?php
 		            		$travelling = 0;
 		            		foreach ($incoming as $key => $value) {
 		            			if($value->status == Config::get('waybill/travelling')) {
@@ -316,7 +320,7 @@
 				                		<th>Receiver</th>
 				                		<th>Sender</th>
 				                		<th>Receiver's Phone</th>
-				                		<?php 
+				                		<?php
 									    	if($user->hasPermission('waybill')) {
 									    ?>
 				                		<th>Mark as received</th>
@@ -326,7 +330,7 @@
 				                	</tr>
 				                </thead>
 				                <tbody>
-		              	<?php 
+		              	<?php
 		              	$arrived = 0;
 		              	foreach ($incoming as $key => $value) {
 		              		if($value->status == Config::get('waybill/arrived')) {
@@ -338,7 +342,7 @@
 				                		<td><?php echo $value->receiver_name?></td>
 				                		<td><?php echo $value->sender_name; ?></td>
 				                		<td><?php echo $value->receiver_phone;?></td>
-				                		<?php 
+				                		<?php
 									    	if($user->hasPermission('waybill')) {
 									    ?>
 				                		<td><input type="checkbox" name="arrived[]" value="<?php echo $value->id ;?>" /></td>
@@ -346,7 +350,7 @@
 				                			<td><button class="btn btn-info details" data-toggle="modal" data-target="#details" name="<?php echo $value->id ?>">Details</button></td>
 				                			<?php }?>
 				                	</tr>
-			            <?php 
+			            <?php
 		              	} } if($arrived == 0) { ?>
 		              	<!--<tr><td>No incoming has arrived</td></tr>-->
 		              	<?php } ?>
@@ -358,7 +362,7 @@
 		              			<div style="background:darkkhaki;color:#fff;float:right;margin-right: 4em;
 														margin-top: 9px;"><span>Mark all</span><input style="margin-left:3em;" type="checkbox" name="markall" />
 												</div>
-		              				
+
 		              		</div>
 		              		<?php } ?>
 		              	</div>
@@ -379,7 +383,7 @@
 				                	</tr>
 				                </thead>
 				                <tbody>
-		              	<?php 
+		              	<?php
 		              	$arrived = 0;
 		              	foreach ($incoming as $key => $value) {
 		              		if($value->status == Config::get('waybill/in_park')) {
@@ -397,7 +401,7 @@
 				                			<td><button class="btn btn-info details" data-toggle="modal" data-target="#details" name="<?php echo $value->id ?>">Details</button></td>
 				                		<?php } ?>
 				                	</tr>
-			            <?php 
+			            <?php
 		              	} } if($arrived == 0) { ?>
 		              	<!--<tr><td>No incoming has arrived</td></tr>-->
 		              	<?php } else {?>
@@ -418,7 +422,7 @@
 				                	</tr>
 				                </thead>
 				                <tbody>
-		              	<?php 
+		              	<?php
 		              	$placed = 0;
 		              	foreach ($incoming as $key => $value) {
 		              		if($value->status == Config::get('waybill/placed')) {
@@ -466,13 +470,13 @@
 				                		<td><?php echo $value->receiver_phone;?></td>
 				                		<td><button class="btn btn-info details" data-toggle="modal" data-target="#details" name="<?php echo $value->id ?>">Details</button></td>
 				                	</tr>
-		              <?php  
+		              <?php
 		              	} } if($picked == 0) {?>
 		              	<!--<tr><td>No incoming had been picked up</td></tr>-->
 		              	<?php } ?>
 		              			</tbody>
 			                </table>
-		              	</div> 
+		              	</div>
 		            </div>
 		          </div>
 		        </div>
@@ -490,7 +494,7 @@
 		                  <li role="presentation"><a role="menuitem" data-toggle="tab" tabindex="-1" href="#outgoing-picked">Picked Up</a></li>
 		                </ul>
 		              </li>
-		              <li class="pull-left header"><i class="fa fa-th"></i> Outgoing</li>
+		              <li class="pull-left header"><i class="fa fa-angle-double-up"></i> Outgoing Items</li>
 		            </ul>
 		            <div class="tab-content">
 		            	<div class="tab-pane active" id="outgoing-travelling">
@@ -506,7 +510,7 @@
 				                	</tr>
 				                </thead>
 				                <tbody>
-		            	<?php 
+		            	<?php
 		            		$travelling = 0;
 		            		foreach ($outgoing as $key => $value) {
 		            			if($value->status == Config::get('waybill/travelling')) {
@@ -540,7 +544,7 @@
 				                	</tr>
 				                </thead>
 				                <tbody>
-		              	<?php 
+		              	<?php
 		              	$arrived = 0;
 		              	foreach ($outgoing as $key => $value) {
 		              		if($value->status == Config::get('waybill/arrived') || $value->status == Config::get('waybill/in_park')) {
@@ -554,7 +558,7 @@
 				                		<td><?php echo $value->receiver_phone;?></td>
 				                		<td><button class="btn btn-info details" data-toggle="modal" data-target="#details" name="<?php echo $value->id ?>">Details</button></td>
 				                	</tr>
-			            <?php 
+			            <?php
 		              	} } if($arrived == 0) { ?>
 		              	<!--<tr><td colspan='6'>No outgoing has arrived</td></tr>-->
 		              	<?php }?>
@@ -574,7 +578,7 @@
 				                	</tr>
 				                </thead>
 				                <tbody>
-		              	<?php 
+		              	<?php
 		              	$placed = 0;
 		              	foreach ($outgoing as $key => $value) {
 		              		if($value->status == Config::get('waybill/placed')) {
@@ -622,17 +626,17 @@
 				                		<td><?php echo $value->receiver_phone;?></td>
 				                		<td><button class="btn btn-info details" data-toggle="modal" data-target="#details" name="<?php echo $value->id ?>">Details</button></td>
 				                	</tr>
-		              <?php  
+		              <?php
 		              	} } if($picked == 0) {?>
 		              	<!--<tr><td colspan='6'>No outgoing had been picked up</td></tr>-->
 		              	<?php } ?>
 		              			</tbody>
 			                </table>
-		              	</div> 
+		              	</div>
 		            </div>
 		          </div>
 		        </div>
-					</div><p class="test"></p>  
+					</div><p class="test"></p>
         </section>
         <!-- right col -->
       </div>
@@ -687,6 +691,7 @@
  			$('form[name=verify]').addClass('hidden');
  			$id = $(this).attr('name');
  			$('button.confirm').attr('name', $id);
+ 			$('button.changeKey').attr('name', $id);
  			$.post('_getwaybilldetails.php', {id: $id}, function($result) {
  				if($result != 'X') {
  					$details = JSON.parse($result);
@@ -703,7 +708,7 @@
  					if($details.status == $picked) {
  						$('table.item').append("<tr class='picked_up'><th>Date Picked</th><td>"+$details.date_picked_up+"</td></tr>");
  					}
- 				} 
+ 				}
  			});
  		}).on('click', 'button.verify', function() {
  			$('form[name=verify]').removeClass('hidden');
@@ -717,8 +722,8 @@
  		}).on('click', 'button.confirm', function(e) {
  			e.preventDefault();
  			$key = $('input[name=key]').val();
- 			$id = $(this).attr('name');
- 			$.post('_getwaybilldetails.php', {key: $key, id: $id}, function($result) {
+ 			id = $(this).attr('name');
+ 			$.post('_getwaybilldetails.php', {key: $key, id: id}, function($result) {
  				if($result == '1') {
  					alert('correct key');
  					$('td button[name='+$id+']').replaceWith("<span class='text text-success'>Verified</span>");
@@ -732,7 +737,18 @@
  			$('a.sidebar-toggle').click();
  			$('section.col-lg-10').removeClass('col-lg-10').addClass('col-lg-7');
  			$('section.col-lg-5').removeClass('hidden');
- 		})
+ 		}).on('click', 'button.changeKey', function(e) {
+			e.preventDefault();
+			$id = $(this).attr('name');
+ 			$.post('_updatestatus.php', {action: 'keychange', id: $id}, function($result) {
+ 				if($result == '1') {
+ 					alert('key changed');
+ 					$('button.close').click();
+ 				} else {
+ 					alert('Problem changing key');
+ 				}
+ 			});
+		})
  	})
 </script>
 <div class="example-modal">
@@ -746,6 +762,18 @@
           <p class="passengererror text-danger"></p>
         </div>
         <div class="modal-body">
+					<?php if($user->hasPermission('manager')) {?>
+						<form role="form" method="post" name="changeKey">
+	            <div class="form-group col-lg-6">
+	              <label for="changekey"></label>
+	              <div class="input-group">
+	              <button style="margin-top:5px;" class="btn btn-sm btn-info changeKey">Send new key to receiver</button>
+	              </div>
+	            </div>
+	          </form>
+
+					<?php }?>
+					<?php if($user->hasPermission('waybill')) {?>
         	<form role="form" method="post" name="verify" class="hidden">
             <div class="form-group col-lg-6">
               <label for="key">Enter Key to confirm</label>
@@ -760,6 +788,7 @@
               </div>
             </div>
           </form>
+				<?php } ?>
           <table class="table table-condensed item">
           	<caption>Item description</caption>
           	<tr>
@@ -813,6 +842,6 @@
   </div>
   <!-- /.modal -->
 </div>
-<?php 
+<?php
 	require_once 'includes/content/footer.php';
 ?>

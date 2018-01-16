@@ -1,4 +1,4 @@
-<?php 
+<?php
 	require_once 'includes/content/header.php';
 	if(!$user->checkPermission(array('manager', 'admin'))) {    //only ceo and manager can see it
 	    Session::flash('home', "You don't have permission to view that page");
@@ -6,6 +6,7 @@
 	}
 	$park = $parkObj->get();
 	$errors = array();
+	//$notice = new Notification();
 	if(Input::exists()) {
 		$validate = new Validate();
 		$validation = $validate->check($_POST, array(
@@ -46,8 +47,16 @@
 					'brand' => Input::get('brand'),
 					'current_location' => Input::get('location'),
 					));
+					$notification->create(array(
+						'message' => Input::get('plate_no')." is now available for travels",
+						'initiated' => $user->data()->id,
+						'location_initiated' => $user->data()->location,
+						'affected' => Config::get('permissions/all'),
+						'location_affected' => Config::get('permissions/all'),
+						'category' => Config::get('notification/vehicle_add'),
+						));
 					Session::flash('home', "Vehicle added successfully");
-					Redirect::to($_SERVER['PHP_SELF']);	
+					Redirect::to($_SERVER['PHP_SELF']);
 			} catch (Exception $e) {
 				print_r($e->getMessage());
 			}
@@ -55,10 +64,10 @@
 			foreach ($validation->errors() as $error) {
 				$errors[] = $error;
 			}
-		}	
+		}
 	}
 ?>
-	
+
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper">
     <!-- Content Header (Page header) -->
@@ -84,7 +93,9 @@
 
     <!-- Main content -->
     <section class="content">
-      
+			<div style="display:inline-block;">
+      	<a href="viewvehicles.php"><button class="btn btn-sm btn-success pull-right">View vehicles <i class="fa fa-link"></i></button></a>
+      </div>
       <!-- Main row -->
       <div class="row">
         <!-- Left col -->
@@ -106,7 +117,7 @@
 		                  <div class="input-group">
 			                  <input type="text" class="form-control" id="model" name="model" value="<?php echo escape(Input::get('model'))?>" required>
 			                  <div class="input-group-addon">
-				               	<i class="fa fa-database"></i>
+				               	<i class="fa fa-bus"></i>
 				               </div>
 				          </div>
 		                </div>
@@ -116,7 +127,7 @@
 		                  <div class="input-group">
 			                  <input type="text" class="form-control" id="brand" name="brand" value="<?php echo escape(Input::get('brand'))?>" required>
 			                  <div class="input-group-addon">
-				               	<i class="fa fa-database"></i>
+				               	<i class="fa fa-automobile"></i>
 				               </div>
 				          </div>
 		                </div>
@@ -126,7 +137,7 @@
 		                  <div class="input-group">
 			                  <input type="number" class="form-control" id="seat" name="seat_no" min="4" value="<?php echo escape(Input::get('seat_no'))?>" required>
 			                  <div class="input-group-addon">
-				               	<i class="fa fa-database"></i>
+				               	<i class="fa fa-chain"></i>
 				               </div>
 				          </div>
 		                </div>
@@ -136,7 +147,7 @@
 		                  <div class="input-group">
 			                  <input type="text" class="form-control" id="plate_no" name="plate_no" value="<?php echo escape(Input::get('plate_no'))?>" required>
 			                  <div class="input-group-addon">
-				               	<i class="fa fa-database"></i>
+				               	<i class="fa fa-tag"></i>
 				               </div>
 				          </div>
 		                </div>
@@ -146,7 +157,7 @@
 		                  <div class="input-group">
 			                  <input type="text" class="form-control" id="engine_no" name="engine_no" value="<?php echo escape(Input::get('engine_no'))?>" required>
 			                  <div class="input-group-addon">
-				               	<i class="fa fa-database"></i>
+				               	<i class="fa fa-cog"></i>
 				               </div>
 				          </div>
 		                </div>
@@ -167,22 +178,22 @@
 			                  <option value="">--select--</option>
 			                  <?php
 			                  	foreach ($park as $value) { ?>
-			                  		<option value="<?php echo $value->id; ?>"><?php echo $value->park; ?></option>
+			                  		<option value="<?php echo $value->id; ?>" <?php if($user->data()->location == $value->id) echo "selected='selected'"?>><?php echo $value->park; ?></option>
 			                  	<?php } ?>
 			                </select>
 			            </div>
-		            
+
 	            </div>
 	            <div class="box-footer">
 	                <input type="submit" class="btn btn-primary" name="vehicleCreate" value="Add Vehicle">
 	            </div>
 	            </form>
-			</div> 
+			</div>
         </section>
         <!-- /.Left col -->
         <!-- right col (We are only adding the ID to make the widgets sortable)-->
         <section class="col-lg-7 connectedSortable">
-        	     
+
         </section>
         <!-- right col -->
       </div>
@@ -191,7 +202,7 @@
     <!-- /.content -->
   </div>
   <!-- /.content-wrapper -->
- 
-<?php 
+
+<?php
 	require_once 'includes/content/footer.php';
 ?>

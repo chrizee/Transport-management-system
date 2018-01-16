@@ -1,6 +1,6 @@
-<?php 
+<?php
 	require_once 'includes/content/header.php';
-	if(!$user->checkPermission(array('staff', 'manager'))) {    //only ceo and manager can see it
+	if(!$user->checkPermission(array('*'))) {    //only ceo and manager can see it
 	    Session::flash('home', "You don't have permission to view that page");
 	    Redirect::to('dashboard.php');
 	}
@@ -20,7 +20,7 @@
 				'required' => true,
 				),
 			));
-		
+
 		if($validation->passed()) {
 			if(!$vehicle->requestCheck(Input::get('request_location'), Input::get('no_of_vehicles'))) {
 				$success = false;
@@ -47,10 +47,10 @@
 			foreach ($validation->errors() as $error) {
 				$errors[] = str_replace('_', ' ', $error);
 			}
-		}	
+		}
 	}
 ?>
-	
+
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper">
     <!-- Content Header (Page header) -->
@@ -75,7 +75,7 @@
     </section>
 
     <!-- Main content -->
-    <section class="content">    
+    <section class="content">
       <!-- Main row -->
       <div class="row">
         <!-- Left col -->
@@ -91,12 +91,12 @@
 	            </div>
             </div>
             <div class="box-body">
-            	
+
 	          </div>
             <div class="box-footer">
-            	
+
             </div>
-					</div> 
+					</div>
         </section>
         <section class="col-lg-8 connectedSortable">
         	<div class="box box-success">
@@ -114,7 +114,7 @@
             <div class="box-body">
             	<?php
             		$disabled = array();
-            		
+
             		foreach ($parks as $key => $value) {
             			//if($value->id == $user->data()->location) continue;
             			$vehicles = $vehicle->get(array('current_location', '=', $value->id, 'status', '=', Config::get('status/good')));
@@ -136,20 +136,20 @@
             					<td><?php echo $value->no_of_seats?></td>
             					<td><?php echo ($value->ac == 1) ? 'Yes' : "No" ?></td>
             				</tr>
-            			
+
             		<?php }?>
 	            		</tbody>
-	            			</table> 
+	            			</table>
 	            	<?php }else{
 	            		$disabled[] = $value->id;
 	            		?>
-            			<p>No Vehicle in <?php echo $value->park; ?></p> 
+            			<p>No Vehicle in <?php echo $value->park; ?></p>
             		<?php } }  $disabled = json_encode($disabled);
             	?>
             </div>
 					</div>
         </section>
-        
+
       </div>
       <!-- /.row (main row) -->
     </section>
@@ -161,7 +161,7 @@
 
 	})
 
-</script> 
-<?php 
+</script>
+<?php
 	require_once 'includes/content/footer.php';
 ?>

@@ -41,17 +41,17 @@
 			$now = new dateTime();
 			$diff = $now->diff($init);
 			if($diff->y != 0 ) {
-				return $diff->format("%y Years %m months %d days");
+				return $diff->format("%y Year(s) %m month(s) %d day(s)");
 			} elseif($diff->m != 0) {
-				return $diff->format("%m months %d days");
+				return $diff->format("%m month(s) %d day(s)");
 			} elseif($diff->d != 0) {
-				return $diff->format("%d days");
+				return $diff->format("%d day(s)");
 			} elseif($diff->h != 0) {
-				return $diff->format("%h hours");
+				return $diff->format("%h hour(s)");
 			} elseif($diff->i != 0) {
-				return $diff->format("%i mins");
+				return $diff->format("%i min(s)");
 			} elseif($diff->s != 0) {
-				return $diff->format("%s secs");
+				return $diff->format("%s sec(s)");
 			} elseif($diff->s == 0) {
 				return "now";
 			}

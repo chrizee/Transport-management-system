@@ -7,7 +7,7 @@
 	$errors = array();
 	$vehicle = new Vehicle('vehicles');
 	$vehicleInfo = $vehicle->get(array('1', '=', '1'));
-
+	$parkGet = $parkObj->get();
 	$errors = array();
 	if(Input::exists()) {
 		$validate = new Validate();
@@ -30,6 +30,9 @@
 			 'current_state' => array(
 			 	'required' => true,
 			 	),
+				'location' => array(
+					'required' => true,
+				)
 			));
 
 		if($validation->passed()) {
@@ -42,6 +45,7 @@
 					'ac' => Input::get('ac'),
 					'brand' => Input::get('brand'),
 					'status' => Input::get('current_state'),
+					'current_location' => Input::get('location'),
 					));
 					Session::flash('home', "Vehicle updated successfully");
 					Redirect::to($_SERVER['PHP_SELF']);
@@ -159,7 +163,7 @@
 			                  }
 		                  	?>
 		                 	</td>
-		                 	<td><?php echo $parkObj->get($value->current_location, 'park')->park; ?></td>
+		                 	<td class="location"><?php echo $parkObj->get($value->current_location, 'park')->park; ?></td>
 		                 	<?php
 								    		if($user->hasPermission('admin') || $user->hasPermission('manager')) {
 								    	?>
@@ -171,7 +175,9 @@
 		          </table>
 		        </div>
 					</div>
-
+					<?php
+					 if($user->hasPermission('admin') || $user->hasPermission('manager')) {
+				 ?>
 					<div class="example-modal">
 		        <div id="vehicles" class="modal fade" role="dialog">
 		          <div class="modal-dialog">
@@ -181,7 +187,7 @@
 		                  <span aria-hidden="true">&times;</span></button>
 		                <h4 class="modal-title">Edit</h4>
 		              </div>
-		              <form role="form" method="post" id="driveredit" action="" name="driveredit">
+		              <form role="form" method="post" id="vehicleedit" action="" name="vehicleedit">
 		              	<input type="hidden" name="id" />
 		              	<div class="modal-body">
 		                	<div class="form-group">
@@ -189,7 +195,7 @@
 		                  <div class="input-group">
 			                  <input type="text" class="form-control" id="model" name="model" required>
 			                  <div class="input-group-addon">
-				               	<i class="fa fa-database"></i>
+				               	<i class="fa fa-bus"></i>
 				               </div>
 				          		</div>
 		                </div>
@@ -199,7 +205,7 @@
 		                  <div class="input-group">
 			                  <input type="text" class="form-control" id="brand" name="brand" min="4" required>
 			                  <div class="input-group-addon">
-				               	<i class="fa fa-database"></i>
+				               	<i class="fa fa-automobile"></i>
 				               </div>
 				          		</div>
 		                </div>
@@ -209,7 +215,7 @@
 		                  <div class="input-group">
 			                  <input type="number" class="form-control" id="seat" name="seat_no" min="4" required>
 			                  <div class="input-group-addon">
-				               	<i class="fa fa-database"></i>
+				               	<i class="fa fa-chain"></i>
 				               </div>
 				          		</div>
 		                </div>
@@ -219,7 +225,7 @@
 		                  <div class="input-group">
 			                  <input type="text" class="form-control" id="plate_no" name="plate_no" required>
 			                  <div class="input-group-addon">
-				               	<i class="fa fa-database"></i>
+				               	<i class="fa fa-tag"></i>
 				               </div>
 				          		</div>
 		                </div>
@@ -233,6 +239,17 @@
 			                	<input type="radio" class="ac_no" name="ac" value="0"> No
 			                </label>
 		                </div>
+
+										<div class="form-group">
+											<label>Location</label>
+											<select style="text-transform:capitalize;" class="form-control" id="location" name="location" style="width: 100%;">
+												<option value="">--select--</option>
+												<?php
+													foreach ($parkGet as $value) { ?>
+														<option value="<?php echo $value->id; ?>"><?php echo $value->park; ?></option>
+													<?php } ?>
+											</select>
+										</div>
 
 		                <div class="form-group">
 			                <label>Current State</label>
@@ -257,6 +274,7 @@
 		        </div>
 		        <!-- /.modal -->
 		    	</div>
+				<?php } ?>
         </section>
         <!-- /.Left col -->
 
@@ -274,16 +292,23 @@
  		$('button.edit').click(function(e) {
  			e.preventDefault();
  			var parent = $(this).parent();
- 			$('input[name=model').val($(parent).siblings('.model').text());
- 			$('input[name=brand').val($(parent).siblings('.brand').text());
- 			$('input[name=plate_no').val($(parent).siblings('.plate_no').text());
- 			$('input[name=seat_no').val($(parent).siblings('.seat_no').text());
- 			$('input[name=engine_no').val($(parent).siblings('.engine_no').text());
- 			$('input[name=id').val($(this).attr('name'));
+ 			$('input[name=model]').val($(parent).siblings('.model').text());
+ 			$('input[name=brand]').val($(parent).siblings('.brand').text());
+ 			$('input[name=plate_no]').val($(parent).siblings('.plate_no').text());
+ 			$('input[name=seat_no]').val($(parent).siblings('.seat_no').text());
+ 			$('input[name=engine_no]').val($(parent).siblings('.engine_no').text());
+ 			$('input[name=id]').val($(this).attr('name'));
 
  			var state = $(parent).siblings('.status').text().trim().toLowerCase();
  			$('select[name=current_state] option').each(function() {
 				if($(this).text().trim().toLowerCase() == state) {
+					$(this).attr('selected', 'selected');
+				}
+			});
+
+			var location = $(parent).siblings('.location').text().trim().toLowerCase();
+ 			$('select[name=location] option').each(function() {
+				if($(this).text().trim().toLowerCase() == location) {
 					$(this).attr('selected', 'selected');
 				}
 			});

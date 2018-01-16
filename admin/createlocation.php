@@ -1,4 +1,4 @@
-<?php 
+<?php
 	require_once 'includes/content/header.php';
 	if(!$user->checkPermission(array('manager', 'admin'))) {    //only ceo and manager can see it
 	    Session::flash('home', "You don't have permission to view that page");
@@ -22,8 +22,16 @@
 					'park' => ucfirst(Input::get('park'))
 					));
 					$success = true;
-					Session::flash('home', "Location created successfully");
-					//Redirect::to('createlocation.php');	
+					//$notice = new Notification();
+					$notification->create(array(
+						'message' => "A new park has been created at ".Input::get('park'),
+						'initiated' => $user->data()->id,
+						'location_initiated' => $user->data()->location,
+						'affected' => Config::get('permissions/all'),
+						'location_affected' => Config::get('permissions/all'),
+						'category' => Config::get('notification/location_add'),
+						));
+					Session::flash('home', "Location created successfully");		//no reload to fill in location routes
 			} catch (Exception $e) {
 				print_r($e->getMessage());
 			}
@@ -31,11 +39,11 @@
 			foreach ($validation->errors() as $error) {
 				$errors[] = $error;
 			}
-		}	
+		}
 	}
 	$park = $parkObj->get();
 ?>
-	
+
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper">
     <!-- Content Header (Page header) -->
@@ -61,7 +69,9 @@
 
     <!-- Main content -->
     <section class="content">
-      
+			<div style="display:inline-block;">
+      	<a href="viewlocation.php"><button class="btn btn-sm btn-success pull-right">View locations <i class="fa fa-link"></i></button></a>
+      </div>
       <!-- Main row -->
       <div class="row">
         <!-- Left col -->
@@ -81,13 +91,13 @@
 		                <div class="form-group">
 		                  <label for="park">Name of park</label>
 		                  <div class="input-group">
-			                  <input type="text" class="form-control" id="park" name="park" value="<?php echo escape(Input::get('park'))?>" required>
+			                  <input type="text" class="form-control" id="park" name="park" value="<?php echo escape(Input::get('park'))?>" required autofocus>
 			                  <div class="input-group-addon">
-				               	<i class="fa fa-database"></i>
+				               	<i class="fa fa-institution"></i>
 				               </div>
 				          </div>
 		                </div>
-		                <?php 
+		                <?php
 		                	if($park) {
 		                ?>
 		                <div class="form-group">
@@ -106,10 +116,10 @@
 		            		<?php } ?>
 	            </div>
 	            <div class="box-footer">
-	                <input type="submit" class="btn btn-primary" name="park_create" value="Create Park">
+	                <input type="submit" class="btn btn-sm btn-primary" name="park_create" value="Create Park">
 	            </div>
 	            </form>
-			</div> 
+			</div>
         </section>
         <!-- /.Left col -->
         <!-- right col (We are only adding the ID to make the widgets sortable)-->
@@ -119,7 +129,7 @@
         		if(Input::get('park_create') && !empty(Input::get('destination')) && $success) {
         			$new = Input::get('park');
         			if(Input::get('destination') == 'all') {
-        				$park2 = $parkObj->get(NULL, "id,park"); 
+        				$park2 = $parkObj->get(NULL, "id,park");
         			} else {
         				foreach (Input::get('destination') as $key => $value) {
         					$park2[] = $parkObj->get($value, "id,park");
@@ -143,7 +153,7 @@
 	            </div>
             </div>
             <div class="box-body">
-            	<form role="form" method="post" name="routes">	
+            	<form role="form" method="post" name="routes">
 		            <table class="table table-bordered table-hover">
 		            	<thead>
 		            		<tr>
@@ -152,14 +162,14 @@
 			                  <th>Price</th>
 			                  <th>Duration</th>
 			                  <th>Send</th>
-			                </tr>	
+			                </tr>
 		            	</thead>
 		                <tbody>
-		                	<?php 
-		                		foreach ($park2 as $key => $value) { ?>			         
+		                	<?php
+		                		foreach ($park2 as $key => $value) { ?>
 		                	<tr>
 			                  <td>
-				                  <input type="hidden" name="<?php echo "source".$key?>" value="<?php echo $sourceId; ?>" /> 
+				                  <input type="hidden" name="<?php echo "source".$key?>" value="<?php echo $sourceId; ?>" />
 				                  <input type="text" class="form-control" placeholder="<?php echo $new; ?>" disabled>
 				              </td>
 			                  <td>
@@ -187,18 +197,18 @@
 			                  <th>Price</th>
 			                  <th>Duration</th>
 			                  <th>Send</th>
-			                </tr>	
+			                </tr>
 		            	</thead>
 		                <tbody>
-		                	<?php 
-		                		foreach ($park2 as $key => $value) { ?>			         
+		                	<?php
+		                		foreach ($park2 as $key => $value) { ?>
 		                	<tr>
 			                  <td>
 				                  <input type="hidden" name="<?php echo "rsource".$key?>" value="<?php echo $value->id; ?>" />
 				                  <input type="text" class="form-control" placeholder="<?php echo $value->park; ?>" disabled>
 				                </td>
 				                <td>
-				                  <input type="hidden" name="<?php echo "rdestination".$key?>" value="<?php echo $sourceId; ?>" /> 
+				                  <input type="hidden" name="<?php echo "rdestination".$key?>" value="<?php echo $sourceId; ?>" />
 				                  <input type="text" class="form-control" placeholder="<?php echo $new; ?>" disabled>
 				                </td>
 			                  <td>
@@ -219,10 +229,10 @@
             <div class="box-footer">
             	<p class="test"></p>
             </div>
-					</div> 
-						<?php 
+					</div>
+						<?php
 							}
-						?> 
+						?>
         </section>
         <!-- right col -->
       </div>
@@ -272,7 +282,7 @@
 		});
 	})
 
-</script> 
-<?php 
+</script>
+<?php
 	require_once 'includes/content/footer.php';
 ?>

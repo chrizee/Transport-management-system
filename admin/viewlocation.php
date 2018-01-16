@@ -1,4 +1,4 @@
-<?php 
+<?php
 	require_once 'includes/content/header.php';
 	if(!$user->checkPermission(array('*'))) {    //all can see it
 	    Session::flash('home', "You don't have permission to view that page");
@@ -7,7 +7,7 @@
 	$errors = array();
 	$park = $parkObj->get();
 ?>
-	
+
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper">
     <!-- Content Header (Page header) -->
@@ -38,7 +38,7 @@
     		if($user->hasPermission('admin') || $user->hasPermission('manager')) {
     	?>
       <div style="display:inline-block;">
-      	<a href="createlocation.php"><button class="btn btn-success pull-right">New <i class="fa fa-plus"></i></button></a>
+      	<a href="createlocation.php"><button class="btn btn-sm btn-success pull-right">New <i class="fa fa-plus"></i></button></a>
       </div>
       <?php } ?>
       <!-- Main row -->
@@ -56,7 +56,7 @@
 	            </div>
             </div>
             <div class="box-body">
-            <?php 
+            <?php
             	if($park) { ?>
 	           	<table class="table table-hover table-condensed">
 	                <thead>
@@ -67,10 +67,10 @@
 		                </tr>
 	                </thead>
 		            <tbody>
-		            	<?php 
-		            	
+		            	<?php
+
 		            		foreach ($park as $key => $value) {
-		            	
+
 		            	?>
 		                <tr>
 		                  <td><?php echo $value->park ?></td>
@@ -80,7 +80,7 @@
 		                  		<button class="btn btn-info">View <i class="fa  fa-angle-double-right"></i></button>
 		                  	</a>
 		                  </td>
-		              <?php } 
+		              <?php }
 		              ?>
 		            </tbody>
 	            </table>
@@ -88,7 +88,7 @@
 	              	echo "No park to display yet";
 		         } ?>
             </div>
-					</div>  
+					</div>
         </section>
         <!-- /.Left col -->
         <!-- right col (We are only adding the ID to make the widgets sortable)-->
@@ -138,9 +138,9 @@
 		                </thead>
 			            <tbody>
 				            <form role="form" method="post" name="routes">
-				            	<?php 
+				            	<?php
 				            	if($parks) {
-				            		foreach ($parks as $key => $value) { 
+				            		foreach ($parks as $key => $value) {
 				            			$arr = array(); $arr2 = array();
 				            			foreach ($routes1 as $key1 => $value1) {
 				            				if($value1->source == $parkid && $value1->destination == $key) {
@@ -161,7 +161,7 @@
 				                  			<?php echo $parkObj->get($parkid, "park")->park; ?>
 															</td>
 						                  <td>
-						                  	<input type="hidden" name="<?php echo "fdestination".$key?>" value="<?php echo $key ?>" /> 
+						                  	<input type="hidden" name="<?php echo "fdestination".$key?>" value="<?php echo $key ?>" />
 				                  			<?php echo $parkObj->get($key, "park")->park; ?>
 						                  </td>
 						                  <td>
@@ -173,17 +173,17 @@
 						                  <?php
 												    		if($user->hasPermission('admin') || $user->hasPermission('manager')) {
 												    	?>
-						                  <td><button class="btn btn-info uforward" name="<?php echo $key; ?>" >Edit</button></td>
+						                  <td><button class="btn btn-info uforward" name="<?php echo $key; ?>" >Update</button></td>
 						                  <?php } ?>
 						                </tr>
 							            <?php } else {	?>
 						            		<tr>
 						                  <td>
-						                  	<input type="hidden" name="<?php echo "fsource".$key?>" value="<?php echo $parkid ?>" /> 
+						                  	<input type="hidden" name="<?php echo "fsource".$key?>" value="<?php echo $parkid ?>" />
 				                  			<?php echo $parkObj->get($parkid, "park")->park; ?>
 															</td>
 						                  <td>
-						                  	<input type="hidden" name="<?php echo "fdestination".$key?>" value="<?php echo $key ?>" /> 
+						                  	<input type="hidden" name="<?php echo "fdestination".$key?>" value="<?php echo $key ?>" />
 				                  			<?php echo $parkObj->get($key, "park")->park; ?>
 						                  </td>
 						                  <td>
@@ -199,19 +199,19 @@
 						                  <?php } ?>
 						                </tr>
 
-						            		
+
 							            <?php }
 
 							            if($arr2) {
 				            			?>
 				            				<tr>
 						                  <td>
-						                  	<input type="hidden" name="<?php echo "rsource".$key?>" value="<?php echo $key ?>" /> 
-						                  	<input type="hidden" name="<?php echo "rid".$key?>" value="<?php echo $arr2->id ?>" /> 
+						                  	<input type="hidden" name="<?php echo "rsource".$key?>" value="<?php echo $key ?>" />
+						                  	<input type="hidden" name="<?php echo "rid".$key?>" value="<?php echo $arr2->id ?>" />
 				                  			<?php echo $parkObj->get($key, "park")->park; ?>
 															</td>
 						                  <td>
-						                  	<input type="hidden" name="<?php echo "rdestination".$key?>" value="<?php echo $parkid ?>" /> 
+						                  	<input type="hidden" name="<?php echo "rdestination".$key?>" value="<?php echo $parkid ?>" />
 				                  			<?php echo $parkObj->get($parkid, "park")->park; ?>
 						                  </td>
 						                  <td>
@@ -223,18 +223,18 @@
 						                  <?php
 												    		if($user->hasPermission('admin') || $user->hasPermission('manager')) {
 												    	?>
-						                  <td><button class="btn btn-info ureverse" name="<?php echo $key; ?>" >Edit</button></td>
+						                  <td><button class="btn btn-info ureverse" name="<?php echo $key; ?>" >Update</button></td>
 						                  <?php } ?>
 						                </tr>
 
 							            <?php } else {	?>
 						            		<tr>
 						                  <td>
-						                  	<input type="hidden" name="<?php echo "rsource".$key?>" value="<?php echo $key ?>" /> 
+						                  	<input type="hidden" name="<?php echo "rsource".$key?>" value="<?php echo $key ?>" />
 				                  			<?php echo $parkObj->get($key, "park")->park; ?>
 															</td>
 						                  <td>
-						                  	<input type="hidden" name="<?php echo "rdestination".$key?>" value="<?php echo $parkid ?>" /> 
+						                  	<input type="hidden" name="<?php echo "rdestination".$key?>" value="<?php echo $parkid ?>" />
 				                  			<?php echo $parkObj->get($parkid, "park")->park; ?>
 						                  </td>
 						                  <td>
@@ -249,9 +249,9 @@
 						                  <td><button class="btn btn-warning nreverse" name="<?php echo $key; ?>" >Add</button></td>
 						                  <?php } ?>
 						                </tr>
-							            <?php }?>			              				
-				              <?php 
-				            		} 
+							            <?php }?>
+				              <?php
+				            		}
 				            	} ?>
 				            </form>
 			            </tbody>
@@ -259,7 +259,7 @@
 	            </div>
 						</div>
         	 	<?php }
-        	 ?>   
+        	 ?>
         </section>
         <!-- right col -->
       </div>
@@ -340,6 +340,6 @@
 
 </script>
 <?php
-	} 
+	}
 	require_once 'includes/content/footer.php';
 ?>

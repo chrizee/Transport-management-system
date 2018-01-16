@@ -9,12 +9,17 @@
 		Redirect::to('viewvehicles.php');
 	}
 	$vehicleId = decode(Input::get('vehicle'));
-	$errors = array();
-	$park = $parkObj->get();
 	$vehicleObj = new Vehicle('vehicles');
 	$vehicle = $vehicleObj->get(array('id', '=', $vehicleId))[0];
+	if(empty($vehicle)) {
+		Session::flash('home', "please select a valid vehicle");
+		Redirect::to('viewvehicles.php');
+	}
+	$errors = array();
+	$park = $parkObj->get();
+
 	$vehicleMaintain = new Vehicle('maintenance');
-	$notice = new Notification();
+	//$notice = new Notification();
 	$history = array_reverse($vehicleMaintain->get(array('vehicle_id', '=', $vehicleId, 'status', '=', Config::get('status/good'))));
 	$ongoing = array_reverse($vehicleMaintain->get(array('vehicle_id', '=', $vehicleId, 'status', '=', Config::get('status/faulty'))));
 	$errors = array();
@@ -45,7 +50,7 @@
 						'status' => Config::get('status/faulty'),
 						));
 
-						$notice->create(array(
+						$notification->create(array(
 							'message' => "Vehicle ".$vehicle->plate_no." is out for maintenance",
 							'initiated' => $user->data()->id,
 							'location_initiated' => $user->data()->location,
@@ -99,7 +104,7 @@
 					'current_location' => Input::get('location'),
 					));
 					if(Input::get('current_state') == Config::get('status/good')) {	//send notification only when vehicle is good again
-						$notice->create(array(
+						$notification->create(array(
 							'message' => "Vehicle ".$vehicle->plate_no." is back from maintenance",
 							'initiated' => $user->data()->id,
 							'location_initiated' => $user->data()->location,

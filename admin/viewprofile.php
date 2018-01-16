@@ -1,5 +1,5 @@
-<?php 
-	require_once 'includes/content/header.php';	
+<?php
+	require_once 'includes/content/header.php';
   if(empty(Input::get("user"))) {
     Session::flash('home', "select a valid user.");
     Redirect::to('viewstaff.php');
@@ -25,14 +25,14 @@
 				'max' => '100',
 				),
 			));
-		
-		
-		
+
+
+
 		if($validation->passed()) {
 			try {
 				$message = new Message();
         $message->put();
-				Session::flash('home', 'Message sent' );	
+				Session::flash('home', 'Message sent' );
 			} catch (Exception $e) {
 				print_r($e->getMessage());
 			}
@@ -42,9 +42,9 @@
 			}
 		}
 	}
-	
+
 ?>
-	
+
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper">
     <!-- Content Header (Page header) -->
@@ -70,7 +70,7 @@
 
     <!-- Main content -->
     <section class="content">
-      
+
       <!-- Main row -->
     <div class="row">
         <div class="col-md-3">
@@ -91,7 +91,7 @@
                   <b>Phone</b> <span class="pull-right text-primary"><?php echo $staff->phone; ?></span>
                 </li>
                 <li class="list-group-item">
-                  <b>status</b> <span class="pull-right text-primary"><?php 
+                  <b>status</b> <span class="pull-right text-primary"><?php
                     switch ($staff->status) {
                           case Config::get('status/sacked'):
                             echo "Sacked";
@@ -105,11 +105,11 @@
                           case Config::get('status/sick'):
                             echo "Sick";
                             break;
-                          
+
                           default:
                             echo "Undefined";
                             break;
-                        } 
+                        }
                    ?></span>
                 </li>
                 <li class="list-group-item">
@@ -125,14 +125,14 @@
           <!-- About Me Box -->
           <div class="box box-primary">
             <div class="box-header with-border">
-              <h3 class="box-title">About Me</h3>
+              <h3 class="box-title">About <?php echo $staff->name ?></h3>
             </div>
             <!-- /.box-header -->
             <div class="box-body">
               <strong><i class="fa fa-book margin-r-5"></i> Education</strong>
 
               <p class="text-muted">
-              	<?php 
+              	<?php
               		$text = '';
               		if(!empty($metaInfo->degree)) {
 	              		if($metaInfo->degree) {
@@ -157,13 +157,13 @@
               <strong><i class="fa fa-pencil margin-r-5"></i> Skills</strong>
 
               <p>
-              	<?php 
+              	<?php
               		if(!empty($metaInfo->skills)) {
 	              		$skills = explode(',', $metaInfo->skills);
 	              		$style = ['label-danger', 'label-success', 'label-info', 'label-warning', 'label-primary'];
 	              		foreach ($skills as $key => $value) {
 	              			$class = $style[rand(1, count($style)-1)];
-              		
+
               	?>
                 <span class="label <?php echo $class; ?>"><?php echo $value?></span>
                 <?php } } ?>
@@ -299,7 +299,7 @@
                       </div>
                       <div class="form-group no-margin-on-form">
                         <textarea id="compose-textarea" name="message" class="form-control" style="height: 300px">
-                          
+
                         </textarea>
                       </div>
                     </div>
@@ -336,7 +336,7 @@
       }
     });
   })
-</script> 
-<?php 
+</script>
+<?php
 	require_once 'includes/content/footer.php';
 ?>

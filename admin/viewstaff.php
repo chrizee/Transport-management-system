@@ -1,17 +1,17 @@
-<?php 
+<?php
 	require_once 'includes/content/header.php';
 	if(!$user->checkPermission(array('*'))) {		//all can view
 		Session::flash('home', "You don't have permission to view that page");
 		Redirect::to('dashboard.php');
 	}
-	
+
 	$errors = array();
 	$driverObj = new Driver('drivers');
 	$driversInfo = $driverObj->get(array('status', '!=', '0'));
 	$staffsInfo = $user->getStaffs(array('status', '!=', '0'));
 	$parkGet = $parkObj->get();
 ?>
-	
+
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper">
     <!-- Content Header (Page header) -->
@@ -37,9 +37,13 @@
 
     <!-- Main content -->
     <section class="content">
+			<?php
+			if($user->hasPermission('admin') || $user->hasPermission('manager')) {
+		?>
       <div style="display:inline-block;">
       	<a href="createstaff.php"><button class="btn btn-success pull-right">New <i class="fa fa-plus"></i></button></a>
       </div>
+		<?php }?>
       <!-- Main row -->
       <div class="row">
         <!-- Left col -->
@@ -71,16 +75,16 @@
 	                </tr>
 	              </thead>
 		            <tbody>
-		            	<?php 
+		            	<?php
 		            		foreach ($driversInfo as $key => $value) {
-		            		
+
 		            	?>
 	                <tr>
 	                  <td class="name"><?php echo $value->name ?></td>
 	                  <td class="email"><?php echo $value->email ?></td>
 	                  <td class="phone"><?php echo $value->phone ?></td>
-	                  <td><?php echo $value->date_created ?></td>
-	                  <td class="status"><?php 
+	                  <td><?php echo explode(' ',$value->date_created)[0] ?></td>
+	                  <td class="status"><?php
 		                  switch ($value->status) {
 		                  	case Config::get('status/sacked'):
 		                  		echo "Sacked";
@@ -103,8 +107,8 @@
 		                  	default:
 		                  		echo "Undefined";
 		                  		break;
-		                  } 
-	                  	?> 
+		                  }
+	                  	?>
 	                 	</td>
 	                 	<td class="location"><?php echo $parkObj->get($value->current_location, "park")->park;?></td>
 	                 	<?php if($user->hasPermission('admin') || $user->hasPermission('manager') || $user->hasPermission('staff')) {?>
@@ -116,7 +120,7 @@
 	            </table>
             </div>
 					</div>
-					
+
 					<div class="example-modal">
 		        <div id="drivers" class="modal fade" role="dialog">
 		          <div class="modal-dialog">
@@ -185,9 +189,9 @@
 					                </select>
 					            	</div>
 
-				                
+
 				              </div>
-				            
+
 		              	</div>
 			              <div class="modal-footer">
 			                <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
@@ -234,7 +238,7 @@
 		                </tr>
 	                </thead>
 		            <tbody>
-		            	<?php 
+		            	<?php
 		            		foreach ($staffsInfo as $key => $value) {
 		            			if(($value->groups == Config::get('permissions/ceo') && !$user->hasPermission('admin')) || $value->id == $user->data()->id) continue; //staff cant see ceo's info and their own info
 		            	?>
@@ -242,14 +246,14 @@
 		                  <td class="name"><a href="viewprofile.php?user=<?php echo encode($value->id)?>"><?php echo $value->name ?></a></td>
 		                  <td class="email"><?php echo $value->email ?></td>
 		                  <td class="phone"><?php echo $value->phone ?></td>
-		                  <td class="location"><?php 
+		                  <td class="location"><?php
 		                  	$park = $parkObj->get($value->location, "id,park");
-		                  	echo $park->park; 
+		                  	echo $park->park;
 		                  ?></td>
 		                  <td class="gender"><?php echo $value->gender ?></td>
 		                  <td class="address"><?php echo $value->address ?></td>
-		                  <td><?php echo $value->created ?></td>
-		                  <td class="status"><?php 
+		                  <td><?php echo explode(' ', $value->created)[0] ?></td>
+		                  <td class="status"><?php
 			                  switch ($value->status) {
 		                          case Config::get('status/sacked'):
 		                            echo "Sacked";
@@ -263,14 +267,14 @@
 		                          case Config::get('status/sick'):
 		                            echo "Sick";
 		                            break;
-		                          
+
 		                          default:
 		                            echo "Undefined";
 		                            break;
 		                        }
-		                  	?> 
+		                  	?>
 		                 	</td>
-		                  <td class="level"><?php 
+		                  <td class="level"><?php
 		                  		switch ($value->groups) {
 			                  	case Config::get('permissions/loading_officer'):
 			                  		echo "Loading officer";
@@ -284,16 +288,16 @@
 			                  	case Config::get('permissions/waybill'):
 			                  		echo "Waybill";
 			                  		break;
-			                  	
+
 			                  	default:
 			                  		echo "Undefined";
 			                  		break;
-			                  } 
-							?>	
+			                  }
+							?>
 							</td>
 							<?php if($user->hasPermission('admin')) { // for ceo and branch managers for their branch staff ?>
 		                  		<td><button type="button" class="btn btn-info staff" name="<?php echo $value->id; ?>" data-toggle="modal" data-target="#staffs">Edit</button></td>
-		                  <?php }else { 
+		                  <?php }else {
 		                  		if(($user->hasPermission('manager') && $user->data()->location == $value->location)) { ?>
 		                  			<td><button type="button" class="btn btn-info staff" name="<?php echo $value->id; ?>" data-toggle="modal" data-target="#staffs">Edit</button></td>
 		                  <?php } else {
@@ -304,7 +308,7 @@
 		            </tbody>
 	              </table>
             </div>
-					</div> 
+					</div>
 
 					<div class="example-modal">
 		        <div id="staffs" class="modal fade" role="dialog">
@@ -437,7 +441,7 @@
 			$('input#drivername').val($(parent).siblings('.name').text());
 			$('input#driverphone').val($(parent).siblings('.phone').text());
 			$('input#driveremail').val($(parent).siblings('.email').text());
-			var status = $(parent).siblings('.status').text();			
+			var status = $(parent).siblings('.status').text();
 			switch(status.trim()) {
 				case "Active":
 					$("input.active").click();
@@ -493,7 +497,7 @@
 				}
 			});
 
-			var status = $(parent).siblings('.status').text();			
+			var status = $(parent).siblings('.status').text();
 			switch(status.trim()) {
 				case "Active":
 					$("input.sactive").click();
@@ -527,7 +531,7 @@
 			});
 		});
 	})
-</script> 
+</script>
 <?php } if($user->hasPermission('staff')) {?>
 	<script type="text/javascript">
 	$(document).ready(function() {
@@ -553,7 +557,7 @@
 
 	})
 </script>
-<?php 
+<?php
 }
 	require_once 'includes/content/footer.php';
 ?>

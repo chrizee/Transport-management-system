@@ -1,4 +1,4 @@
-<?php 
+<?php
 	require_once 'includes/content/header.php';
   if(!$user->checkPermission(array('staff'))) {    //only staff can see it
     Session::flash('home', "You don't have permission to view that page");
@@ -15,7 +15,7 @@
   $passengerObj = new Passenger('temp_passengers');
   $prefill = $passengerObj->get(array('user_id', '=', $user->data()->id));  //try and filter with date too
 ?>
-	
+
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper">
     <!-- Content Header (Page header) -->
@@ -37,7 +37,7 @@
 
     <!-- Main content -->
     <section class="content">
-      
+
       <!-- Main row -->
       <div class="row">
         <!-- Left col -->
@@ -62,7 +62,7 @@
                   <select style="text-transform:capitalize;" class="form-control" id="destination" name="destination" style="width: 100%;">
                     <option value="">--select--</option>
                     <?php
-                      foreach ($parkGet as $value) { 
+                      foreach ($parkGet as $value) {
                         if($value->id == $user->data()->location) continue; ?>
                         <option value="<?php echo $value->id; ?>"><?php echo $value->park; ?></option>
                       <?php } ?>
@@ -86,8 +86,8 @@
               </div>
              <?php } else {?>
               <p>No vehicle in park currently.</p>
-              <a href="vehiclerequest.php"><button class="btn btn-primary" name="vehicleRequest" value="Request for Vehicle"></button></a>
-              <?php } 
+              <a href="vehiclerequest.php"><span class="btn btn-primary">Request for Vehicle</span></a>
+              <?php }
               if(!empty($drivers)) {
             ?>
               <div class="form-group">
@@ -105,14 +105,14 @@
               <?php } ?>
             </div>
             </form>
-            <?php 
-             if(!empty($drivers) && !empty($vehicles)) { 
+            <?php
+             if(!empty($drivers) && !empty($vehicles)) {
             ?>
             <div class="box-footer">
               <input type="submit" class="btn btn-primary pull-middle" name="selectload" value="Go">
             </div>
             <?php } ?>
-    			</div><p class="test"></p>          
+    			</div><p class="test"></p>
         </section>
         <!-- /.Left col -->
         <!-- middle col (We are only adding the ID to make the widgets sortable)-->
@@ -135,7 +135,7 @@
                     <div class="input-group">
                       <input type="text" class="form-control" id="price" name="price" value="" autofocus="on" data-inputmask="'alias': 'decimal'" data-mask>
                       <div class="input-group-addon">
-                      <i class="fa fa-database"></i>
+                      <i class="fa fa-exchange"></i>
                      </div>
                     </div>
                   </div>
@@ -152,8 +152,8 @@
                   </thead>
                   <tbody>
                   <?php
-                    if($prefill) { 
-                      foreach ($prefill as $key => $value) { 
+                    if($prefill) {
+                      foreach ($prefill as $key => $value) {
                         $passengerObj->update($value->id, array('hash' => $hash));
                         ?>
                       <tr>
@@ -166,7 +166,7 @@
                   ?>
                   </tbody>
                 </table>
-                
+
                 <!-- /.box-body -->
               </div>
               <div class="box-footer hidden addpassenger">
@@ -175,7 +175,7 @@
               <div class="box-footer continue hidden">
                 <button class="btn btn-warning" id="continue">Continue</button>
               </div>
-          </div> 
+          </div>
         </section>
 
         <section class="col-lg-3 connectedSortable" id="right">
@@ -202,7 +202,7 @@
                     <tr class="init vehicle"></tr>
                   </tbody>
                 </table>
-                
+
                 <!-- /.box-body -->
               </div>
           </div>
@@ -259,7 +259,7 @@
     var $interval = setInterval(function() {
       if($('select[name=vehicle]').val() != '') {
         clearInterval($interval);
-        return false; 
+        return false;
       }
       //runPost();
     }, 2000);
@@ -267,7 +267,7 @@
     var $noOfSeats = '', $ac = '', $hash = '', $priceCheck = true, $ticket = <?php echo Config::get('ticket/start');?>;
     $hash = "<?php echo $hash; ?>";
     $('section#middle, section#right').hide();
-    
+
     $('select[name=destination]').change(function() {
       $ticket = <?php echo Config::get('ticket/start');?>;
       if(!($('body').hasClass('sidebar-collapse'))) {
@@ -338,7 +338,7 @@
       });
       if($(this).val() != '') {
         appendToStatus('Driver', $('select[name=driver] option:selected').text());
-        $('section#right').slideDown('slow'); 
+        $('section#right').slideDown('slow');
       } else {
         removeAppend(['Driver']);
       }
@@ -382,7 +382,7 @@
             $('div.addpassenger').hide();
             appendToStatus("vehicle Status", "Full");
             $('div.continue').removeClass('hidden');
-          } 
+          }
         });
       } else {
         $noOfSeats = 0;
@@ -436,7 +436,7 @@
           appendToStatus("Vehicle status", ($noOfSeats - $('table#passengers tbody tr').length - 1) + " spaces(s) left")
         }
       }
-      
+
       $phone = ($('input[name=phone]').val() != "") ? $('input[name=phone]').val() : '08088888888';
       $email = ($('input[name=email]').val() != "") ? $('input[name=email]').val() : 'example@transport.com';
       $address = ($('input[name=address]').val() != "") ? $('input[name=address]').val() : 'none';
@@ -467,7 +467,7 @@
           $('p.passengererror').text("Ensure all fields are filled with the correct value!");
         } else{
           $error = JSON.parse($result);
-          $('p.passengererror').text($error);   
+          $('p.passengererror').text($error);
         }
       });
       //send to temp table in DB and add to table
@@ -490,7 +490,7 @@
           e.preventDefault();
           $(this).css('border','1px solid red');
           $pass = false;
-        } 
+        }
       });
       if($pass === true) {
         $('select[name=vehicle], select[name=driver], select[name=destination]').css('borderColor','green');
@@ -511,7 +511,7 @@
         }
       });
       if(!$priceCheck) {
-        $pass = false; 
+        $pass = false;
         $('input[name=price]').css('border', '1px solid red');
       } else {
         $('input[name=price]').css('border', '1px solid gray');
@@ -545,7 +545,7 @@
               <div class="input-group">
                 <input type="text" class="form-control" id="name" name="name" value="" required autofocus="on">
                 <div class="input-group-addon">
-                <i class="fa fa-database"></i>
+                <i class="fa fa-user"></i>
                </div>
               </div>
             </div>
@@ -555,7 +555,7 @@
               <div class="input-group">
                 <input type="email" class="form-control" id="email" name="email" value="">
                 <div class="input-group-addon">
-                <i class="fa fa-database"></i>
+                <i class="fa fa-envelope"></i>
                </div>
               </div>
             </div>
@@ -565,7 +565,7 @@
               <div class="input-group">
                 <input type="tel" class="form-control" id="phone" name="phone" value="">
                 <div class="input-group-addon">
-                <i class="fa fa-database"></i>
+                <i class="fa fa-phone"></i>
                </div>
               </div>
             </div>
@@ -575,7 +575,7 @@
               <div class="input-group">
                 <input type="address" class="form-control" id="address" name="address" value="">
                 <div class="input-group-addon">
-                <i class="fa fa-database"></i>
+                <i class="fa fa-building"></i>
                </div>
               </div>
             </div>
@@ -585,7 +585,7 @@
               <div class="input-group">
                 <input type="text" class="form-control" id="blood" name="blood" value="">
                 <div class="input-group-addon">
-                <i class="fa fa-database"></i>
+                <i class="fa fa-heart"></i>
                </div>
               </div>
             </div>
@@ -595,7 +595,7 @@
               <div class="input-group">
                 <input type="text" class="form-control" id="kin" name="kin" value="">
                 <div class="input-group-addon">
-                <i class="fa fa-database"></i>
+                <i class="fa fa-user"></i>
                </div>
               </div>
             </div>
@@ -612,6 +612,6 @@
   </div>
   <!-- /.modal -->
 </div>
-<?php 
+<?php
 	require_once 'includes/content/footer.php';
 ?>

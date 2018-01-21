@@ -10,20 +10,20 @@ class DB {
 	private function __construct() {
 		//connect to the database
 		try {
-			$this->_pdo = new PDO('mysql:host='.config::get('mysql/host').';dbname='.config::get('mysql/db'),config::get('mysql/username'),config::get('mysql/password'));	
+			$this->_pdo = new PDO('mysql:host='.config::get('mysql/host').';dbname='.config::get('mysql/db'),config::get('mysql/username'),config::get('mysql/password'));
 		} catch (PDOException $e) {
 			die($e->getMessage());
 		}
 	}
 
 	public static function getInstance() {
-		if(!isset(self::$_instance)) { 
+		if(!isset(self::$_instance)) {
 		//checks if instance is set and sets it if not
 		//makes connection to db to be done once in __construct
 		//creates an instance of the DB class
 			self::$_instance = new DB();
 		}
-		//returns an instance of the connection ie object 
+		//returns an instance of the connection ie object
 		return self::$_instance;
 	}
 
@@ -52,7 +52,7 @@ class DB {
 		return $this;
 	}
 
-	//prototype method for mysql actions 
+	//prototype method for mysql actions
 	public  function action($action, $table, $where = array()) {
 		$operators = array('=', '>', '<', '>=', '<=', '<>', '<=>', '!=', 'LIKE');
 		/*if(count($where) === 3) {
@@ -66,7 +66,7 @@ class DB {
 				if(!$this->query($sql,array($value))->error()) {
 					return $this;
 				}
-			}	
+			}
 		}
 		if(count($where) === 6) {
 			$field1 		= $where[0];
@@ -81,12 +81,12 @@ class DB {
 				if(!$this->query($sql,array($value1, $value2))->error()) {
 					return $this;
 				}
-			}	
+			}
 		}*/
 		if(count($where) % 3 == 0) {
 			$z = count($where) / 3;
-			$wherestr = ""; 
-			$value = array(); 
+			$wherestr = "";
+			$value = array();
 			$operator = array();
 			for($x = 0,$y= 1; $y <= $z; $y++, $x += 3) {
 				$whr = array_slice($where, $x, 3);
@@ -108,7 +108,7 @@ class DB {
 				return $this;
 			}
 		}
-		
+
 		return false;
 	}
 
@@ -121,7 +121,7 @@ class DB {
 	}
 
 	//method for inserting values into tables specified in the parameter
-	public function insert($table, $fields = array()) {		
+	public function insert($table, $fields = array()) {
 		$keys = array_keys($fields);
 		$values = '';
 		$x = 1;
@@ -135,11 +135,11 @@ class DB {
 		}
 
 		$sql = "INSERT INTO {$table} (`" . implode('`, `', $keys). "`) VALUES ({$values})";
-		
+
 		if(!$this->query($sql, $fields)->error()) {
 			return true;
 		}
-		
+
 		return false;
 	}
 
@@ -155,13 +155,13 @@ class DB {
 			}
 			$x++;
 		}
-		
+
 		$sql = "UPDATE {$table} SET {$set} WHERE {$key} = {$id}";
 
 		if(!$this->query($sql, $fields)->error()) {
 			return true;
 		}
-		return false;		
+		return false;
 	}
 
 	public function transaction() {
@@ -192,11 +192,11 @@ class DB {
 			return true;
 		}
 		return false;
-	}	
+	}
 
 	public function createDb($dbName = array()) {
 		$sql = "CREATE DATABASE IF NOT EXISTS ?";
-		
+
 		if(!$this->query($sql, $dbName)->error()) {
 			return true;
 		}
@@ -204,7 +204,7 @@ class DB {
 	}
 
 	public function results() {
-		return $this->_results; 
+		return $this->_results;
 	}
 
 	public function first() {
@@ -213,9 +213,9 @@ class DB {
 
 	public function error() {
 		return $this->_error;
-	} 
+	}
 
 	public function count() {
 		return $this->_count;
-	}	
+	}
 }

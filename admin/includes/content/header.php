@@ -20,6 +20,16 @@
       $count++;
     }
   }
+
+  $messageObj = new Message();
+  $message = array_reverse($messageObj->getN($user->data()->id, $user->data()->location));
+  $trash = array_reverse($messageObj->getN($user->data()->id, $user->data()->location,true));
+  $newMail = 0;
+  foreach ($message as $key => $value) {
+    if($value->status == Config::get('message/not_read')) {
+      $newMail++;
+    }
+  }
 ?>
 
 <!DOCTYPE html>
@@ -47,12 +57,20 @@
   <link rel="stylesheet" href="plugins/jvectormap/jquery-jvectormap-1.2.2.css">
   <!-- Date Picker -->
   <link rel="stylesheet" href="plugins/datepicker/datepicker3.css">
+  <!-- fullCalendar 2.2.5-->
+  <link rel="stylesheet" href="plugins/fullcalendar/fullcalendar.min.css">
+  <link rel="stylesheet" href="plugins/fullcalendar/fullcalendar.print.css" media="print">
   <!-- Daterange picker -->
   <link rel="stylesheet" href="plugins/daterangepicker/daterangepicker.css">
   <!-- bootstrap wysihtml5 - text editor -->
   <link rel="stylesheet" href="plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.min.css">
   <!-- iCheck -->
   <link rel="stylesheet" href="plugins/iCheck/square/blue.css">
+  <?php
+  if(basename($_SERVER['PHP_SELF'], '.php') == "mailbox") {
+  ?>
+  <link rel="stylesheet" href="plugins/iCheck/flat/blue.css">
+<?php } ?>
   <!-- DataTables -->
   <link rel="stylesheet" href="plugins/datatables/dataTables.bootstrap.css">
   <!-- Select2 -->
@@ -69,6 +87,9 @@
     margin-left: 0;
     margin-right: 0;
     margin-bottom: 1em;
+  }
+  .text-default {
+    color:#000;
   }
 </style>
 
@@ -129,49 +150,33 @@
                   <?php } ?>
                 </ul>
               </li>
-              <li class="footer"><a href="#">See All Messages</a></li>
             </ul>
           </li>
           <!-- Notifications: style can be found in dropdown.less -->
           <li class="dropdown notifications-menu">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-              <i class="fa fa-bell-o"></i>
-              <span class="label label-warning">10</span>
+              <i class="fa fa-envelope-o"></i>
+              <span class="label label-warning"><?php echo ($newMail == 0) ? '' : $newMail; ?></span>
             </a>
             <ul class="dropdown-menu">
-              <li class="header">You have 10 notifications</li>
+              <li class="header">You have <?php echo ($newMail == 0)? 'no' : $newMail; ?> messages</li>
               <li>
                 <!-- inner menu: contains the actual data -->
                 <ul class="menu">
-                  <li>
-                    <a href="#">
-                      <i class="fa fa-users text-aqua"></i> 5 new members joined today
+                  <?php
+                    foreach ($message as $key => $value) {
+                      if($key >= 10) break;
+                  ?>
+                  <li style="position:relative;">
+                    <a href="read-mail.php?mail=<?php echo encode($value->id);?>">
+                      <i class="fa fa-envelope <?php if($value->status == Config::get('message/not_read')) echo 'text-aqua'?>"></i> <?php echo $value->subject?>
+                      <span style="position:absolute;right:6px;top:10px;font-size:9px" class="pull-right"><i class="fa fa-clock-o"></i> <?php echo  $messageObj->date($value->date);?></span>
                     </a>
                   </li>
-                  <li>
-                    <a href="#">
-                      <i class="fa fa-warning text-yellow"></i> Very long description here that may not fit into the
-                      page and may cause design problems
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#">
-                      <i class="fa fa-users text-red"></i> 5 new members joined
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#">
-                      <i class="fa fa-shopping-cart text-green"></i> 25 sales made
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#">
-                      <i class="fa fa-user text-red"></i> You changed your username
-                    </a>
-                  </li>
+                  <?php } ?>
                 </ul>
               </li>
-              <li class="footer"><a href="#">View all</a></li>
+              <li class="footer"><a href="mailbox.php">View all</a></li>
             </ul>
           </li>
           <!-- Tasks: style can be found in dropdown.less -->
@@ -401,6 +406,25 @@
           <a href="account.php">
             <i class="fa fa-envelope"></i> <span>Accounts</span>
           </a>
+        </li>
+        <li class="treeview">
+          <a href="mailbox.php">
+            <i class="fa fa-envelope"></i> <span>Mailbox</span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            <li class="active">
+              <a href="mailbox.php">Inbox
+                <span class="pull-right-container">
+                  <span class="label label-primary pull-right"><?php echo ($newMail == 0) ? '' : $newMail; ?></span>
+                </span>
+              </a>
+            </li>
+            <li><a href="compose.php">Compose</a></li>
+            <li><a href="sentmail.php">Sent</a></li>
+          </ul>
         </li>
         <li class="treeview">
           <a href="_logout.php">

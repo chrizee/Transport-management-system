@@ -62,6 +62,7 @@ $GLOBALS['config'] = array(
 	'message' => array(
 		'not_read' => 0,
 		'read' => 1,
+		'deleted' => 2,
 	),
 	'notification' => array(
 		'status' => array(

@@ -2,7 +2,7 @@
 	class Action {
 
 		//method to get data from non static classes like drivers etc
-		public function get($where =  array(), $fields = '*') {
+		public function get($where =  array('1', '=', '1'), $fields = '*') {
 			if(!$data = DB::getInstance()->get($this->_table, $where, $fields)) {
 				throw new Exception("There was a problem getting data");
 			}

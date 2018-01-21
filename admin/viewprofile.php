@@ -25,9 +25,6 @@
 				'max' => '100',
 				),
 			));
-
-
-
 		if($validation->passed()) {
 			try {
 				$message = new Message();

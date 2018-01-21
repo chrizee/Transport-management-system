@@ -3,18 +3,44 @@
 	$db = DB::getInstance();
 	$routeObj = new Route('routes');
 	$route = $routeObj->get(array('1','=','1'),'source,destination,price');
+	$park = $parkObj->get();
+	$errors = array();
+	$pass = true;
 	if(Input::exists() && !empty(Input::get('sendEmail'))) {
 		$validate = new Validate();
 		$validation = $validate->check($_POST, array(
 			'subject' => array(
+				'required' => true,
 				'max' => '100',
 				),
+			'message' => array(
+				'required' => true,
+				'min' => '5',
+				),
 			));
-		if($validation->passed()) {
+		if(empty(Input::get('recipient')) && empty(Input::get('recipients'))) {
+			$errors[] = "Recipient is required";
+			$pass = false;
+		}
+		if($validation->passed() && $pass) {
 			try {
 				$message = new Message();
-        $message->put();
-				Session::flash('home', 'Message sent' );
+				if(!empty(Input::get('recipients'))) {
+					$_POST['to'] = "*";
+					$message->put();
+				} elseif(!empty(Input::get('recipient'))) {
+					foreach (Input::get('recipient') as $key => $value) {
+						$_POST['location'] = '';		//necessary to prevent location from being available in the put method of the message class
+							if(strstr($value,'all')) {
+							$_POST['location'] = explode('--',$value)[1];
+							$message->put();
+						}	else{
+							$_POST['to'] = $value;
+							$message->put();
+						}
+					}
+				}
+				Session::flash('home', 'Message sent');
 			} catch (Exception $e) {
 				print_r($e->getMessage());
 			}
@@ -37,6 +63,11 @@
       <?php if(Session::exists('home')) {
             echo "<p class='text text-center'>".Session::flash('home')."</p>";
         }
+				if($errors) {
+    			foreach ($errors as  $value) {
+    				echo "<p class='text text-center'>$value</p>";
+    			}
+    		}
       ?>
       <ol class="breadcrumb">
         <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
@@ -115,13 +146,27 @@
           <div class="nav-tabs-custom">
             <!-- Tabs within a box -->
             <ul class="nav nav-tabs pull-right">
-              <li><a href="#chart" data-toggle="tab">Chart</a></li>
-              <li class="active"><a href="#list" data-toggle="tab">List</a></li>
-              <li class="pull-left header"><i class="fa fa-inbox"></i> Price</li>
+              <li><a href="#routes" data-toggle="tab">Routes</a></li>
+              <li class="active"><a href="#list" data-toggle="tab">Price list</a></li>
+              <li class="pull-left header"><i class="fa fa-inbox"></i> Our Routes</li>
             </ul>
             <div class="tab-content no-padding">
               <!-- Morris chart - Sales -->
-              <div class="chart tab-pane" id="chart" style="position: relative; height: 300px;"></div>
+              <div class="chart tab-pane" id="routes" style="position: relative; height: 300px; padding:10px;">
+								<?php if(count($park) != 0) {?>
+								<p class="text text-info">Our parks are located in the following locations across the country:</p>
+								<ol style="text-transform:capitalize">
+									<?php
+
+									foreach ($park as $key => $value) {
+									?>
+									<li><?php echo $value->park."."; ?></li>
+								<?php } ?>
+							</ol>
+						<?php }else{?>
+							<p>No park Available.</p>
+						<?php }?>
+							</div>
               <div class="chart tab-pane active" id="list" style="position: relative;padding:.4em;">
 								<table class="table text-center table-condensed table-hover datatable">
 									<thead>
@@ -167,154 +212,54 @@
               <!-- /. tools -->
             </div>
             <div class="box-body">
-              <form action="" method="post">
+              <form action="" method="post" name="quickMail">
+								<div class="form-group">
+									<?php
+										$staffs = $user->getStaffs(array('id','!=', $user->data()->id));
+									?>
+									<label>Recipients</label>
+									<select class="form-control select2" multiple="multiple" name="recipient[]" data-placeholder="Select recipient(s)" style="width: 100%;">
+									<?php
+									if($user->checkPermission(array('admin','manager'))) {
+										foreach ($park as $key => $value) { ?>
+											<option value="<?php echo "all--".$value->id?>"><?php echo "All in ".$value->park; ?></option>
+										<?php } }
+											foreach ($staffs as $value) { ?>
+												<option value="<?php echo $value->id; ?>"><?php echo str_pad($value->name,20,'-'); ?><span class="pull-right"><?php echo $user->getTitle($value->groups)." in ".$parkObj->get($value->location, 'park')->park; ?></span></option>
+										<?php } ?>
+									</select>
+									<?php if($user->checkPermission(array('admin','manager'))) { ?>
+										<br/><br/>
+									<label>All staffs&nbsp;&nbsp;&nbsp;</label>
+									<label>
+										<input type="radio" name="recipients" value="all">
+									</label>
+									<?php } ?>
+								</div>
                 <div class="form-group">
-									<div class="form-group">
-										<?php
-											$staffs = $user->getStaffs(array('id','!=', $user->data()->id));
-										?>
-										<label>Recipients</label>
-										<select class="form-control select2" multiple="multiple" name="recipient" data-placeholder="Select a Park" style="width: 100%;">
-										<?php
-												foreach ($staffs as $value) { ?>
-													<option value="<?php echo $value->id; ?>"><?php echo str_pad($value->name,20,'-'); ?><span class="pull-right"><?php echo $user->getTitle($value->groups)." in ".$parkObj->get($value->location, 'park')->park; ?></span></option>
-											<?php } ?>
-										</select><br/><br/>
-										<label>Select All &nbsp;&nbsp;&nbsp;</label>
-										<label>
-											<input type="radio" name="destination" value="all">
-										</label>
-									</div>
-                  <input type="hidden" class="form-control" name="to" placeholder="Email to:">
-                </div>
-                <div class="form-group">
-                  <input type="text" class="form-control" name="subject" placeholder="Subject">
+                  <input type="text" class="form-control" name="subject" placeholder="Subject" required>
                 </div>
                 <div>
-                  <textarea class="textarea" name="message" placeholder="Message" style="width: 100%; height: 125px; font-size: 14px; line-height: 18px; border: 1px solid #dddddd; padding: 10px;"></textarea>
+                  <textarea class="textarea" name="message" placeholder="Message" style="width: 100%; height: 125px; font-size: 14px; line-height: 18px; border: 1px solid #dddddd; padding: 10px;" required></textarea>
                 </div>
-              </form>
-            </div>
-            <div class="box-footer clearfix">
-              <button type="submit" class="pull-right btn btn-default" name="sendEmail" id="sendEmail">Send
-                <i class="fa fa-arrow-circle-right"></i></button>
-            </div>
+		            <div class="box-footer clearfix">
+		              <input type="submit" class="pull-right btn btn-default" name="sendEmail" id="sendEmail" value="Send">
+		            </div>
+							</form>
+						</div>
           </div>
 
         </section>
         <!-- /.Left col -->
         <!-- right col (We are only adding the ID to make the widgets sortable)-->
         <section class="col-lg-5 connectedSortable">
-
-          <!-- Map box -->
-          <div class="box box-solid bg-light-blue-gradient">
-            <div class="box-header">
-              <!-- tools box -->
-              <div class="pull-right box-tools">
-                <button type="button" class="btn btn-primary btn-sm daterange pull-right" data-toggle="tooltip" title="Date range">
-                  <i class="fa fa-calendar"></i></button>
-                <button type="button" class="btn btn-primary btn-sm pull-right" data-widget="collapse" data-toggle="tooltip" title="Collapse" style="margin-right: 5px;">
-                  <i class="fa fa-minus"></i></button>
-              </div>
-              <!-- /. tools -->
-
-              <i class="fa fa-map-marker"></i>
-
-              <h3 class="box-title">
-                Visitors
-              </h3>
-            </div>
-            <div class="box-body">
-              <div id="world-map" style="height: 250px; width: 100%;"></div>
-            </div>
-            <!-- /.box-body-->
-            <div class="box-footer no-border">
-              <div class="row">
-                <div class="col-xs-4 text-center" style="border-right: 1px solid #f4f4f4">
-                  <div id="sparkline-1"></div>
-                  <div class="knob-label">Visitors</div>
-                </div>
-                <!-- ./col -->
-                <div class="col-xs-4 text-center" style="border-right: 1px solid #f4f4f4">
-                  <div id="sparkline-2"></div>
-                  <div class="knob-label">Online</div>
-                </div>
-                <!-- ./col -->
-                <div class="col-xs-4 text-center">
-                  <div id="sparkline-3"></div>
-                  <div class="knob-label">Exists</div>
-                </div>
-                <!-- ./col -->
-              </div>
-              <!-- /.row -->
-            </div>
-          </div>
-          <!-- /.box -->
-
-          <!-- solid sales graph -->
-          <div class="box box-solid bg-teal-gradient">
-            <div class="box-header">
-              <i class="fa fa-th"></i>
-
-              <h3 class="box-title">Sales Graph</h3>
-
-              <div class="box-tools pull-right">
-                <button type="button" class="btn bg-teal btn-sm" data-widget="collapse"><i class="fa fa-minus"></i>
-                </button>
-                <button type="button" class="btn bg-teal btn-sm" data-widget="remove"><i class="fa fa-times"></i>
-                </button>
-              </div>
-            </div>
-            <div class="box-body border-radius-none">
-              <div class="chart" id="line-chart" style="height: 250px;"></div>
-            </div>
-            <!-- /.box-body -->
-            <div class="box-footer no-border">
-              <div class="row">
-                <div class="col-xs-4 text-center" style="border-right: 1px solid #f4f4f4">
-                  <input type="text" class="knob" data-readonly="true" value="20" data-width="60" data-height="60" data-fgColor="#39CCCC">
-
-                  <div class="knob-label">Mail-Orders</div>
-                </div>
-                <!-- ./col -->
-                <div class="col-xs-4 text-center" style="border-right: 1px solid #f4f4f4">
-                  <input type="text" class="knob" data-readonly="true" value="50" data-width="60" data-height="60" data-fgColor="#39CCCC">
-
-                  <div class="knob-label">Online</div>
-                </div>
-                <!-- ./col -->
-                <div class="col-xs-4 text-center">
-                  <input type="text" class="knob" data-readonly="true" value="30" data-width="60" data-height="60" data-fgColor="#39CCCC">
-
-                  <div class="knob-label">In-Store</div>
-                </div>
-                <!-- ./col -->
-              </div>
-              <!-- /.row -->
-            </div>
-            <!-- /.box-footer -->
-          </div>
-          <!-- /.box -->
-
           <!-- Calendar -->
           <div class="box box-solid bg-green-gradient">
             <div class="box-header">
               <i class="fa fa-calendar"></i>
-
               <h3 class="box-title">Calendar</h3>
               <!-- tools box -->
               <div class="pull-right box-tools">
-                <!-- button with a dropdown -->
-                <div class="btn-group">
-                  <button type="button" class="btn btn-success btn-sm dropdown-toggle" data-toggle="dropdown">
-                    <i class="fa fa-bars"></i></button>
-                  <ul class="dropdown-menu pull-right" role="menu">
-                    <li><a href="#">Add new event</a></li>
-                    <li><a href="#">Clear events</a></li>
-                    <li class="divider"></li>
-                    <li><a href="#">View calendar</a></li>
-                  </ul>
-                </div>
                 <button type="button" class="btn btn-success btn-sm" data-widget="collapse"><i class="fa fa-minus"></i>
                 </button>
                 <button type="button" class="btn btn-success btn-sm" data-widget="remove"><i class="fa fa-times"></i>
@@ -326,49 +271,6 @@
             <div class="box-body no-padding">
               <!--The calendar -->
               <div id="calendar" style="width: 100%"></div>
-            </div>
-            <!-- /.box-body -->
-            <div class="box-footer text-black">
-              <div class="row">
-                <div class="col-sm-6">
-                  <!-- Progress bars -->
-                  <div class="clearfix">
-                    <span class="pull-left">Task #1</span>
-                    <small class="pull-right">90%</small>
-                  </div>
-                  <div class="progress xs">
-                    <div class="progress-bar progress-bar-green" style="width: 90%;"></div>
-                  </div>
-
-                  <div class="clearfix">
-                    <span class="pull-left">Task #2</span>
-                    <small class="pull-right">70%</small>
-                  </div>
-                  <div class="progress xs">
-                    <div class="progress-bar progress-bar-green" style="width: 70%;"></div>
-                  </div>
-                </div>
-                <!-- /.col -->
-                <div class="col-sm-6">
-                  <div class="clearfix">
-                    <span class="pull-left">Task #3</span>
-                    <small class="pull-right">60%</small>
-                  </div>
-                  <div class="progress xs">
-                    <div class="progress-bar progress-bar-green" style="width: 60%;"></div>
-                  </div>
-
-                  <div class="clearfix">
-                    <span class="pull-left">Task #4</span>
-                    <small class="pull-right">40%</small>
-                  </div>
-                  <div class="progress xs">
-                    <div class="progress-bar progress-bar-green" style="width: 40%;"></div>
-                  </div>
-                </div>
-                <!-- /.col -->
-              </div>
-              <!-- /.row -->
             </div>
           </div>
           <!-- /.box -->
@@ -382,7 +284,20 @@
     <!-- /.content -->
   </div>
   <!-- /.content-wrapper -->
-<script>
+<script type="text/javascript">
+	$(document).ready(function() {
+		$(document).on('click', 'input[name=sendEmail]', function(e) {
+			//e.preventDefault();
+			//alert('Select recipient');
+			if($("select[name^=recipient] :selected").val() == '') {
+				e.preventDefault();
+				alert('Select recipient');
+			}
+		});
+		//The Calender
+		$("#calendar").datepicker();
+	})
+</script>
 <?php
 	require_once 'includes/content/footer.php';
 ?>

@@ -4,4 +4,3 @@
 	$user->logout();
 
 	Redirect::to('login.php');
-?>

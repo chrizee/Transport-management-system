@@ -209,9 +209,9 @@
 
 <!-- Bootstrap 3.3.6 -->
 <script src="../scripts/bootstrap.min.js"></script>
-<!-- Morris.js charts -->
+<!-- Morris.js charts
 <script src="https://cdnjs.cloudflare.com/ajax/libs/raphael/2.1.0/raphael-min.js"></script>
-<script src="plugins/morris/morris.min.js"></script>
+<script src="plugins/morris/morris.min.js"></script>-->
 <!-- Sparkline -->
 <script src="plugins/sparkline/jquery.sparkline.min.js"></script>
 <!-- jvectormap -->
@@ -253,7 +253,7 @@
       $(this).addClass('btn-sm');
     }
   });
-//Datemask dd/mm/yyyy
+    //Datemask dd/mm/yyyy
     //$("#datemask").inputmask("dd/mm/yyyy", {"placeholder": "dd/mm/yyyy"});
     //Money Euro
     $("[data-mask]").inputmask();
@@ -268,9 +268,10 @@
   });*/
   $.widget.bridge('uibutton', $.ui.button);
 </script>
+
 </body>
 </html>
-<?php 
+<?php
   ob_end_flush();
   ob_end_clean();
 ?>

@@ -1,5 +1,6 @@
 <?php
 	require_once '../core/init.php';
+	$user = new User();
 	if(!$user->checkPermission(array('staff'))) {    //only staff can see it
 	    Session::flash('home', "You don't have permission to view that page");
 	    Redirect::to('dashboard.php');
@@ -13,7 +14,7 @@
 	} catch (Exception $e) {
 		print_r($e->getMessage());
 	}
-	
+
 	$invoiceNo = decode(Input::get('invoice_no'));
 	$invoiceObj = new Invoice();
 	$invoice = $invoiceObj->get(array('id', '=', $invoiceNo));
@@ -21,18 +22,18 @@
 	$travelId = $invoice[0]->travel_id;
 	$travelObj = new Travels('travels');
 	$travel = $travelObj->get(array('id', '=', $travelId));
-	
+
 
 	$destination = $travel[0]->destination;
 	$source = $travel[0]->source;
-
+	$parkObj = new Park();
 	$passengerObj = new Passenger('passengers');
 	$routeObj = new Route('routes');
-	$vehicleObj = new Vehicle('vehicles');	
+	$vehicleObj = new Vehicle('vehicles');
 	$driverObj = new Driver('drivers');
 	$travelObj = new Travels('travels');
 	$waybillObj = new Waybill('waybill');
-	
+
 	try {
 		$passengers = $passengerObj->get(array('travel_id', '=', $travelId));
 		$route = $routeObj->get(array('source', '=', $source, 'destination', '=', $destination));

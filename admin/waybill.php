@@ -2,7 +2,7 @@
 	require_once 'includes/content/header.php';
 	if(!$user->checkPermission(array('staff'), false)) {		//only staff cannot see it
 		Session::flash('home', "You don't have permission to view that page");
-		Redirect::to('dashboard.php');
+		Redirect::to('dashboard');
 	}
 	$park = $parkObj->get();
 	$errors = array();
@@ -678,7 +678,7 @@
  					$arr.push($(this).val());
  				}
  			});
-	 			$.post('_updatestatus.php', {id: $arr, key: 'waybill'}, function($result) {
+	 			$.post('-updatestatus', {id: $arr, key: 'waybill'}, function($result) {
 	 				if($result == 1) {
 	 					$('input[name^=arrived]').each(function() {
 			 				if(this.checked){
@@ -692,7 +692,7 @@
  			$id = $(this).attr('name');
  			$('button.confirm').attr('name', $id);
  			$('button.changeKey').attr('name', $id);
- 			$.post('_getwaybilldetails.php', {id: $id}, function($result) {
+ 			$.post('-getwaybilldetails', {id: $id}, function($result) {
  				if($result != 'X') {
  					$details = JSON.parse($result);
  					$('table.item tr.picked_up').remove();
@@ -723,7 +723,7 @@
  			e.preventDefault();
  			$key = $('input[name=key]').val();
  			id = $(this).attr('name');
- 			$.post('_getwaybilldetails.php', {key: $key, id: id}, function($result) {
+ 			$.post('-getwaybilldetails', {key: $key, id: id}, function($result) {
  				if($result == '1') {
  					alert('correct key');
  					$('td button[name='+$id+']').replaceWith("<span class='text text-success'>Verified</span>");
@@ -740,7 +740,7 @@
  		}).on('click', 'button.changeKey', function(e) {
 			e.preventDefault();
 			$id = $(this).attr('name');
- 			$.post('_updatestatus.php', {action: 'keychange', id: $id}, function($result) {
+ 			$.post('-updatestatus', {action: 'keychange', id: $id}, function($result) {
  				if($result == '1') {
  					alert('key changed');
  					$('button.close').click();

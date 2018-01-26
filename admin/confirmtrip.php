@@ -2,12 +2,12 @@
 	require_once 'includes/content/header.php';	
 	if(!$user->checkPermission(array('staff'))) {    //only staff can see it
 	    Session::flash('home', "You don't have permission to view that page");
-	    Redirect::to('dashboard.php');
+	    Redirect::to('dashboard');
 	}
 	$errors = array();
 	if(!Session::exists(Config::get('session/load')) || !Input::exists() || !Cookie::exists(Config::get('cookie/load')) || (Session::get(Config::get('session/load')) != Cookie::get(Config::get('cookie/load'))) ) {
 		Session::flash('home', "Can't load that page without a valid trip");
-		Redirect::to('load.php');
+		Redirect::to('load');
 	}
 	$session = Session::get(Config::get('session/load'));
 	$destination = Input::get('destination');
@@ -224,7 +224,7 @@
       <!-- this row will not appear when printing -->
       <div class="row no-print">
         <div class="col-xs-12">
-          <a href="invoice-print.php?invoice_no=<?php echo encode($invoiceNo) ; ?>" target="_blank" class="btn btn-default pull-right"><i class="fa fa-print"></i> Print</a>
+          <a href="invoice-print_<?php echo encode($invoiceNo) ; ?>" target="_blank" class="btn btn-default pull-right"><i class="fa fa-print"></i> Print</a>
         </div>
       </div>
     </section>

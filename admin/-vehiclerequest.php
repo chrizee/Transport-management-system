@@ -3,11 +3,11 @@
 	if(Input::exists()) {
 		if(count(Input::get('driver')) == 0 || count(Input::get('vehicle')) == 0) {
 			Session::flash('home', "Both vehicle and driver is required");
-			Redirect::to($_SERVER['HTTP_REFERER']);
+			Redirect::to('vehiclerequest');
 		}
 		if(count(Input::get('driver')) < count(Input::get('vehicle'))) {
 			Session::flash('home', "vehicles cannot be more than drivers");
-			Redirect::to($_SERVER['HTTP_REFERER']);
+			Redirect::to('vehiclerequest');
 		}
 		$travelObj = new Travels('travels');
 		$notification = new Notification();
@@ -34,7 +34,7 @@
 					$notification->update($notice->id, array('status' => Config::get('notification/status/responded')));
 					//echo '1';
 					Session::flash('home', "response sent");
-					Redirect::to($_SERVER['HTTP_REFERER']);
+					Redirect::to('vehiclerequest');
 				} else {
 					$travelObj->create(array(
 						'vehicle_id' => $value,
@@ -49,12 +49,12 @@
 					$notification->update($notice->id, array('status' => Config::get('notification/status/responded')));
 					//echo '1';
 					Session::flash('home', "response sent");
-					Redirect::to($_SERVER['HTTP_REFERER']);
+					Redirect::to('vehiclerequest');
 				}	
 			} catch (Exception $e) {
 				//echo "0";
 				Session::flash('home', "Error responding to request");
-				Redirect::to($_SERVER['HTTP_REFERER']);
+				Redirect::to('vehiclerequest');
 			}
 			
 		}

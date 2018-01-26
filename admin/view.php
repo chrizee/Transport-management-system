@@ -2,7 +2,7 @@
 	require_once 'includes/content/header.php';
 	if(!$user->checkPermission(array('*'))) {    //all can see it
 	    Session::flash('home', "You don't have permission to view that page");
-	    Redirect::to('dashboard.php');
+	    Redirect::to('dashboard');
 	}
 	$vehicle = new Vehicle('vehicles');
 	$driver = new Driver('drivers');
@@ -127,7 +127,7 @@
  			$id = $(this).val();
  			$targetparent = $(this).parents('div.targetparent');
 
- 			$.post('_arrive.php', {tripid: $id}, function($result) {
+ 			$.post('-arrive', {tripid: $id}, function($result) {
  				if($result == 1) {
  					$no_completed_by_clicks++;
  					$('strong.vehicle').text($($targetparent).siblings('h4').text().trim().replace(/:/g, " -"));

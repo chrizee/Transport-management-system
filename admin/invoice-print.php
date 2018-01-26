@@ -3,11 +3,11 @@
 	$user = new User();
 	if(!$user->checkPermission(array('staff'))) {    //only staff can see it
 	    Session::flash('home', "You don't have permission to view that page");
-	    Redirect::to('dashboard.php');
+	    Redirect::to('dashboard');
 	}
 	if(!Session::exists(Config::get('session/load'))) {
 		Session::flash('home', "Can't load that page without a valid trip");
-		Redirect::to('load.php');
+		Redirect::to('load');
 	}
 	try {
 		$init = Info::get();
@@ -15,7 +15,7 @@
 		print_r($e->getMessage());
 	}
 
-	$invoiceNo = decode(Input::get('invoice_no'));
+	$invoiceNo = decode($Qstring);
 	$invoiceObj = new Invoice();
 	$invoice = $invoiceObj->get(array('id', '=', $invoiceNo));
 

@@ -2,7 +2,7 @@
 	require_once 'includes/content/header.php';	
   if(!$user->checkPermission(array('*'))) {    //all can see it
     Session::flash('home', "You don't have permission to view that page");
-    Redirect::to('dashboard.php');
+    Redirect::to('dashboard');
   }
 	$errors = array();
 	//if(!empty($user->getMeta()->results())) $meta = $user->getMeta()->first();

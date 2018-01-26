@@ -2,7 +2,7 @@
 	require_once 'includes/content/header.php';
 	if(!$user->checkPermission(array('manager', 'admin'))) {    //only ceo and manager can see it
 	    Session::flash('home', "You don't have permission to view that page");
-	    Redirect::to('dashboard.php');
+	    Redirect::to('dashboard');
 	}
 	$success = false;
 	$errors = array();
@@ -70,7 +70,7 @@
     <!-- Main content -->
     <section class="content">
 			<div style="display:inline-block;">
-      	<a href="viewlocation.php"><button class="btn btn-sm btn-success pull-right">View locations <i class="fa fa-link"></i></button></a>
+      	<a href="viewlocation"><button class="btn btn-sm btn-success pull-right">View locations <i class="fa fa-link"></i></button></a>
       </div>
       <!-- Main row -->
       <div class="row">
@@ -265,7 +265,7 @@
 			var $destination = $("input[name=destination"+name+"]").val();
 			var $price = $("input[name=price"+name+"]").val();
 			var $duration = $("input[name=duration"+name+"]").val();
-			$.post('_addroute.php', {source: $source, destination: $destination, price: $price , duration: $duration }, function($return) {
+			$.post('-addroute', {source: $source, destination: $destination, price: $price , duration: $duration }, function($return) {
 				Success($return, name, 'forward')
 			});
 		});
@@ -276,7 +276,7 @@
 			var $destination = $("input[name=rdestination"+name+"]").val();
 			var $price = $("input[name=rprice"+name+"]").val();
 			var $duration = $("input[name=rduration"+name+"]").val();
-			$.post('_addroute.php', {source: $source, destination: $destination, price: $price , duration: $duration }, function($return) {
+			$.post('-addroute', {source: $source, destination: $destination, price: $price , duration: $duration }, function($return) {
 				Success($return,name, 'reverse');
 			});
 		});

@@ -7,14 +7,14 @@
 		}
 		public function getN($id,$location, $trash = false) {
 			if($trash) {
-				$sql = "SELECT * FROM message WHERE recipient = ? AND `from` != ? AND status = ".Config::get('message/deleted');
+				$sql = "SELECT * FROM message WHERE recipient = ? AND receiver_status = ".Config::get('message/deleted')." OR `from` = ? AND sender_status = ".Config::get('message/deleted');
 				if(!$data = DB::getInstance()->query($sql, array($id, $id))) {
 					throw new Exception("There was a problem getting data");
 				}
 				return $data->results();
 			}
-			$sql = "SELECT * FROM message WHERE recipient =  ? AND `from` != ? AND status != ".Config::get('message/deleted');
-			if(!$data = DB::getInstance()->query($sql, array($id, $id))) {
+			$sql = "SELECT * FROM message WHERE recipient =  ? AND receiver_status != ".Config::get('message/deleted');
+			if(!$data = DB::getInstance()->query($sql, array($id))) {
 				throw new Exception("There was a problem getting data");
 			}
 			return $data->results();

@@ -1,3 +1,51 @@
 <?php
-	require_once '../core/init.php';
-	Redirect::to('dashboard.php');
+	//require_once '../core/init.php';
+	//Redirect::to('dashboard.php');
+	require_once 'Routes.php';
+	$route = new Routes();
+	$route->add('/');
+	$route->add('/-addpassengers');
+	$route->add('/-addroute');
+	$route->add('/-arrive');
+	$route->add('/-editstaff');
+	$route->add('/-getprice');
+	$route->add('/-getwaybilldetails');
+	$route->add('/-logout');
+	$route->add('/-mail');
+	$route->add('/-realtimestatus');
+	$route->add('/-updateStatus');
+	$route->add('/-vehiclerequest');
+	$route->add('/account');
+	$route->add('/addwaybill');
+	$route->add('/compose');
+	$route->add('/confirmtrip');
+	$route->add('/createlocation');
+	$route->add('/createstaff');
+	$route->add('/createvehicle');
+	$route->add('/dashboard');
+	$route->add('/invoice-print');
+	$route->add('/load');
+	$route->add('/login');
+	$route->add('/mailbox');
+	$route->add('/profile');
+	$route->add('/read-mail');
+	$route->add('/account');
+	$route->add('/selectload');
+	$route->add('/sentmail');
+	$route->add('/trash');
+	$route->add('/vehicle');
+	$route->add('/vehiclerequest');
+	$route->add('/view');
+	$route->add('/viewlocation');
+	$route->add('/viewprofile');
+	$route->add('/viewstaff');
+	$route->add('/viewvehicles');
+	$route->add('/waybill');
+	$query = $route->submit();
+	$Qstring = '';
+	if(!empty($query[1])) $Qstring = $query[1];
+	if(file_exists($query[0].'.php')) {
+		require_once($query[0].'.php');
+	} else{
+		require_once('includes/errors/404');
+	}

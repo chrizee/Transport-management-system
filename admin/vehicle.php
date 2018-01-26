@@ -2,18 +2,18 @@
 	require_once 'includes/content/header.php';
 	if(!$user->checkPermission(array('admin', 'manager'))) {
 	    Session::flash('home', "You don't have permission to view that page");
-	  	Redirect::to('viewvehicles.php');
+	  	Redirect::to('viewvehicles');
 	}
-	if(empty(Input::get('vehicle'))) {
+	if(empty($Qstring)) {
 		Session::flash('home', "please select a valid vehicle");
-		Redirect::to('viewvehicles.php');
+		Redirect::to('viewvehicles');
 	}
-	$vehicleId = decode(Input::get('vehicle'));
+	$vehicleId = decode($Qstring);
 	$vehicleObj = new Vehicle('vehicles');
 	$vehicle = $vehicleObj->get(array('id', '=', $vehicleId))[0];
 	if(empty($vehicle)) {
 		Session::flash('home', "please select a valid vehicle");
-		Redirect::to('viewvehicles.php');
+		Redirect::to('viewvehicles');
 	}
 	$errors = array();
 	$park = $parkObj->get();
@@ -58,8 +58,8 @@
 							'location_affected' => Config::get('permissions/all'),
 							'category' => Config::get('notification/vehicle_bad'),
 							));
-					Session::flash('home', "Fault sent");
-					Redirect::to("vehicle.php?vehicle=".encode($vehicleId));
+					Session::flash('home', "Fault added");
+					Redirect::to("vehicle_".$Qstring);
 			} catch (Exception $e) {
 				print_r($e->getMessage());
 			}
@@ -114,7 +114,7 @@
 							));
 					}
 				Session::flash('home', "Vehicle's Record Updated.");
-				Redirect::to("vehicle.php?vehicle=".encode($vehicleId));
+				Redirect::to("vehicle_".$Qstring);
 			} catch (Exception $e) {
 				print_r($e->getMessage());
 			}
@@ -342,7 +342,7 @@
 									</div>
 									</div>
 
-									<input type="submit" class="btn btn-sm pull-right" name="complete" value="Send" />
+									<input type="submit" class="btn btn-sm pull-right" name="complete" value="Update" />
 								</form>
 						</div>
 					</div>
@@ -374,9 +374,11 @@
 				}
 			})
 			if(pass) {
-				var $confirm = confirm("By clicking Send you are changing the status of the vehicle to active in the current location");
-				if(!$confirm) {
-					e.preventDefault();
+				if($("select[name=current_state]").val() == "<?php echo Config::get('status/good'); ?>") { 
+					var $confirm = confirm("By clicking Send you are changing the status of the vehicle to active in the current location");
+					if(!$confirm) {
+						e.preventDefault();
+					}
 				}
 			}
 		});

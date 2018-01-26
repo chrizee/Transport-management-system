@@ -2,7 +2,7 @@
 	require_once 'includes/content/header.php';
 	if(!$user->checkPermission(array('manager', 'admin'))) {    //only ceo and manager can see it
 	    Session::flash('home', "You don't have permission to view that page");
-	    Redirect::to('dashboard.php');
+	    Redirect::to('dashboard');
 	}
 	$park = $parkObj->get();
 	$errors = array();
@@ -66,7 +66,7 @@
 							'category' => Config::get('notification/staff_add'),
 							));
 						Session::flash('home', "Staff created successfully");
-						Redirect::to('createstaff.php');
+						Redirect::to('createstaff');
 				} catch (Exception $e) {
 					print_r($e->getMessage());
 				}
@@ -116,7 +116,7 @@
 							'category' => Config::get('notification/driver_add'),
 							));
 					Session::flash('home', "Driver created successfully");
-					Redirect::to('createstaff.php');
+					Redirect::to('createstaff');
 				} catch (Exception $e) {
 					print_r($e->getMessage());
 				}
@@ -150,7 +150,7 @@
     <!-- Main content -->
     <section class="content">
 			<div style="display:inline-block;">
-      	<a href="viewstaff.php"><button class="btn btn-sm btn-success pull-right">View staffs <i class="fa fa-link"></i></button></a>
+      	<a href="viewstaff"><button class="btn btn-sm btn-success pull-right">View staffs <i class="fa fa-link"></i></button></a>
       </div>
       <!-- Main row -->
       <div class="row">

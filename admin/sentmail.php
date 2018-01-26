@@ -1,6 +1,6 @@
 <?php
 	require_once 'includes/content/header.php';
-	$message = $messageObj->get(array("`from`", '=', $user->data()->id));
+	$message = $messageObj->get(array("`from`", '=', $user->data()->id, 'sender_status', '!=', Config::get('message/deleted')));
 ?>
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper">
@@ -24,7 +24,7 @@
     <section class="content">
       <div class="row">
         <div class="col-md-3">
-          <a href="compose.php" class="btn btn-primary btn-block margin-bottom">Compose</a>
+          <a href="compose" class="btn btn-primary btn-block margin-bottom">Compose</a>
 
           <div class="box box-solid">
             <div class="box-header with-border">
@@ -37,11 +37,10 @@
             </div>
             <div class="box-body no-padding">
               <ul class="nav nav-pills nav-stacked">
-                <li><a href="mailbox.php"><i class="fa fa-inbox"></i> Inbox
+                <li><a href="mailbox"><i class="fa fa-inbox"></i> Inbox
                   <span class="label label-primary pull-right"><?php echo ($newMail == 0) ? '' : $newMail ?></span></a></li>
-                <li class="active"><a href="sentmail.php"><i class="fa fa-envelope-o"></i> Sent</a></li>
-                </li>
-                <li><a href="trash.php"><i class="fa fa-trash-o"></i> Trash <span class="label label-warning pull-right"><?php echo (count($trash) == 0) ? '' : count($trash) ?></span></a></li>
+                <li class="active"><a href="sentmail"><i class="fa fa-envelope-o"></i> Sent</a></li>
+                <li><a href="trash"><i class="fa fa-trash-o"></i> Trash <span class="label label-warning pull-right"><?php echo (count($trash) == 0) ? '' : count($trash) ?></span></a></li>
               </ul>
             </div>
             <!-- /.box-body -->
@@ -68,7 +67,7 @@
                   <button type="button" title="forward" class="btn btn-default btn-sm"><i class="fa fa-share"></i></button>
                 </div>
                 <!-- /.btn-group -->
-                <a href="<?php echo $_SERVER['PHP_SELF']; ?>"><button type="button" title="refresh" class="btn btn-default btn-sm"><i class="fa fa-refresh"></i></button></a>
+                <a href="<?php echo "sentmail"; ?>"><button type="button" title="refresh" class="btn btn-default btn-sm"><i class="fa fa-refresh"></i></button></a>
                 <p class="mail-error text-center text-danger"></p>
                 <!--<div class="pull-right">
                   1-50/200
@@ -92,15 +91,16 @@
                   </thead>
                   <tbody>
                     <?php
+                    $message = array_reverse($message);
                     foreach ($message as $key => $value) {
                     ?>
                   <tr>
                     <td><input type="checkbox" name="markedMails[]" value="<?php echo encode($value->id)?>"></td>
-                    <td class="mailbox-name"><a href="read-mail.php?mail=<?php echo encode($value->id);?>"><?php $sender = new User($value->recipient); echo $sender->data()->name;?></a></td>
-                    <td class="mailbox-subject"><a class="<?php echo ($value->status == Config::get('message/not_read')) ?'text-success' : 'text-default text-sm';?>" href="read-mail.php?mail=<?php echo encode($value->id);?>"><b><?php echo $value->subject ?></b> - <?php echo substr(strip_tags($value->message),0,30) . "..."; ?>
+                    <td class="mailbox-name"><a href="read-mail_<?php echo encode($value->id);?>"><?php $sender = new User($value->recipient); echo $sender->data()->name;?></a></td>
+                    <td class="mailbox-subject"><a class="<?php echo ($value->receiver_status == Config::get('message/not_read')) ?'text-success' : 'text-default text-sm';?>" href="read-mail_<?php echo encode($value->id);?>"><b><?php echo $value->subject ?></b> - <?php echo substr(strip_tags($value->message),0,30) . "..."; ?>
                     </td></a>
-                    <td><?php echo ($value->status == Config::get('message/not_read')) ? 'not read' : 'Read'?></td>
-                    <td class="mailbox-date"><a href="read-mail.php?mail=<?php echo encode($value->id);?>"><?php echo $messageObj->date($value->date)." ago"; ?></td>
+                    <td><?php echo ($value->receiver_status == Config::get('message/not_read')) ? 'not read' : 'Read'?></td>
+                    <td class="mailbox-date"><a href="read-mail_<?php echo encode($value->id);?>"><?php echo $messageObj->date($value->date)." ago"; ?></td>
                   </tr>
                 <?php }?>
 
@@ -121,7 +121,7 @@
                   <button type="button" title="forward" class="btn btn-default btn-sm"><i class="fa fa-share"></i></button>
                 </div>
                 <!-- /.btn-group -->
-                <a href="<?php echo $_SERVER['PHP_SELF']; ?>"><button type="button" title="refresh" class="btn btn-default btn-sm"><i class="fa fa-refresh"></i></button></a>
+                <a href="sentmail"><button type="button" title="refresh" class="btn btn-default btn-sm"><i class="fa fa-refresh"></i></button></a>
                 <!--<div class="pull-right">
                   1-50/200
                   <div class="btn-group">
@@ -154,7 +154,6 @@
       checkboxClass: 'icheckbox_flat-blue',
       radioClass: 'iradio_flat-blue'
     });
-
     //Enable check and uncheck all functionality
     $(".checkbox-toggle").click(function () {
       var clicks = $(this).data('clicks');
@@ -177,7 +176,7 @@
       });
       if($clicked.length > 0) {
         $('p.mail-error').fadeOut();
-        $.post('_mail.php', {id: $clicked, action: 'delete'}, function($result) {
+        $.post('-mail', {id: $clicked, action: 'delete', who: 'sender'}, function($result) {
           if($result == 1) {
             $('p.mail-error').text('Deleted').fadeOut('1000');
             $('input[name^=markedMails]').filter(':checked').each(function(i,val) {
@@ -197,7 +196,7 @@
         $clicked.push($(this).val());
       });
       if($clicked.length == 1) {
-        window.location = "compose.php?forward="+$clicked[0]; 
+        window.location = "compose_forward="+$clicked[0]; 
       }else {
         e.preventDefault();
        $('p.mail-error').text('Select one message to forward'); 

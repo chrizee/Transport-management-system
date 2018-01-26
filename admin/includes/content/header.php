@@ -9,7 +9,7 @@
   $parkObj = new Park();
   if(!$user->isLoggedIn()) {
     Session::flash('home', "you need to login to access that page");
-    Redirect::to('login.php');
+    Redirect::to('login');
   }
   if(!empty($user->getMeta()->results())) $meta = $user->getMeta()->first();
   $notification = new Notification();
@@ -26,7 +26,7 @@
   $trash = array_reverse($messageObj->getN($user->data()->id, $user->data()->location,true));
   $newMail = 0;
   foreach ($message as $key => $value) {
-    if($value->status == Config::get('message/not_read')) {
+    if($value->receiver_status == Config::get('message/not_read')) {
       $newMail++;
     }
   }
@@ -40,6 +40,7 @@
   <title><?php echo $init->title ?></title>
   <!-- Tell the browser to be responsive to screen width -->
   <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+  <meta http-equiv="Cache-control" content="private">
   <!-- Bootstrap 3.3.6 -->
   <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
   <!-- Font Awesome -->
@@ -105,7 +106,7 @@
 
   <header class="main-header">
     <!-- Logo -->
-    <a href="dashboard.php" class="logo">
+    <a href="dashboard" class="logo">
       <!-- mini logo for sidebar mini 50x50 pixels -->
       <span class="logo-mini"><?php echo $init->header_mini ?></span>
       <!-- logo for regular state and mobile devices -->
@@ -133,7 +134,7 @@
                 <ul class="menu">
                   <?php foreach ($notice as $key => $value) { ?>
                   <li><!-- start message -->
-                    <a href="<?php echo $notification->links[$value->category].'.php'; ?>">
+                    <a href="<?php echo $notification->links[$value->category]; ?>">
                       <div class="pull-left">
                         <img src="<?php
                         $userNotice = new User($value->initiated);
@@ -168,15 +169,15 @@
                       if($key >= 10) break;
                   ?>
                   <li style="position:relative;">
-                    <a href="read-mail.php?mail=<?php echo encode($value->id);?>">
-                      <i class="fa fa-envelope <?php if($value->status == Config::get('message/not_read')) echo 'text-aqua'?>"></i> <?php echo $value->subject?>
+                    <a href="read-mail_<?php echo encode($value->id);?>">
+                      <i class="fa fa-envelope <?php if($value->receiver_status == Config::get('message/not_read')) echo 'text-aqua'?>"></i> <?php echo $value->subject?>
                       <span style="position:absolute;right:6px;top:10px;font-size:9px" class="pull-right"><i class="fa fa-clock-o"></i> <?php echo  $messageObj->date($value->date);?></span>
                     </a>
                   </li>
                   <?php } ?>
                 </ul>
               </li>
-              <li class="footer"><a href="mailbox.php">View all</a></li>
+              <li class="footer"><a href="mailbox">View all</a></li>
             </ul>
           </li>
           <!-- Tasks: style can be found in dropdown.less -->
@@ -287,10 +288,10 @@
               <!-- Menu Footer-->
               <li class="user-footer">
                 <div class="pull-left">
-                  <a href="profile.php" class="btn btn-default btn-flat">Profile</a>
+                  <a href="profile" class="btn btn-default btn-flat">Profile</a>
                 </div>
                 <div class="pull-right">
-                  <a href="_logout.php" class="btn btn-default btn-flat">Sign out</a>
+                  <a href="-logout" class="btn btn-default btn-flat">Sign out</a>
                 </div>
               </li>
             </ul>
@@ -332,13 +333,13 @@
       <ul class="sidebar-menu">
         <li class="header">MAIN NAVIGATION</li>
         <li class="active treeview">
-          <a href="dashboard.php">
+          <a href="dashboard">
             <i class="fa fa-dashboard"></i> <span>Dashboard</span>
           </a>
         </li>
         <li class="treeview">
           <a href="#">
-            <i class="fa fa-files-o"></i>
+            <i class="fa fa-automobile"></i>
             <span>Travels</span>
             <span class="pull-right-container">
               <i class="fa fa-angle-left pull-right"></i>
@@ -348,37 +349,37 @@
           <?php
             if($user->hasPermission('staff')) {
           ?>
-            <li><a href="load.php"><i class="fa fa-circle-o"></i> Load new</a></li>
+            <li><a href="load"><i class="fa fa-circle-o"></i> Load new</a></li>
           <?php } ?>
-            <li><a href="view.php"><i class="fa fa-circle-o"></i> View</a></li>
+            <li><a href="view"><i class="fa fa-circle-o"></i> View</a></li>
           </ul>
         </li>
         <?php
           if($user->checkPermission(array('staff'),false)) {
         ?>
         <li>
-          <a href="waybill.php">
-            <i class="fa fa-th"></i> <span>Waybill</span>
+          <a href="waybill">
+            <i class="fa fa-suitcase"></i> <span>Waybill</span>
           </a>
         </li>
         <?php } ?>
         <li class="treeview">
           <a href="#">
-            <i class="fa fa-pie-chart"></i>
+            <i class="fa fa-lightbulb-o"></i>
             <span>View</span>
             <span class="pull-right-container">
               <i class="fa fa-angle-left pull-right"></i>
             </span>
           </a>
           <ul class="treeview-menu">
-            <li><a href="viewstaff.php"><i class="fa fa-circle-o"></i> Staffs</a></li>
-            <li><a href="viewvehicles.php"><i class="fa fa-circle-o"></i> Vehicles</a></li>
-            <li><a href="viewlocation.php"><i class="fa fa-circle-o"></i> Location</a></li>
+            <li><a href="viewstaff"><i class="fa fa-circle-o"></i> Staffs</a></li>
+            <li><a href="viewvehicles"><i class="fa fa-circle-o"></i> Vehicles</a></li>
+            <li><a href="viewlocation"><i class="fa fa-circle-o"></i> Location</a></li>
           </ul>
         </li>
         <li>
-          <a href="passengers.php">
-            <i class="fa fa-calendar"></i> <span> Passengers</span>
+          <a href="passengers">
+            <i class="fa fa-users"></i> <span> Passengers</span>
             <span class="pull-right-container">
               <small class="label pull-right bg-red">3</small>
               <small class="label pull-right bg-blue">17</small>
@@ -389,26 +390,26 @@
           if($user->hasPermission('admin') || $user->hasPermission('manager')) { ?>
             <li class="treeview">
               <a href="#">
-                <i class="fa fa-pie-chart"></i>
+                <i class="fa fa-plus-square"></i>
                 <span>Create</span>
                 <span class="pull-right-container">
                   <i class="fa fa-angle-left pull-right"></i>
                 </span>
               </a>
               <ul class="treeview-menu">
-                <li><a href="createstaff.php"><i class="fa fa-circle-o"></i> Staff</a></li>
-                <li><a href="createvehicle.php"><i class="fa fa-circle-o"></i> Vehicle</a></li>
-                <li><a href="createlocation.php"><i class="fa fa-circle-o"></i> Location</a></li>
+                <li><a href="createstaff"><i class="fa fa-circle-o"></i> Staff</a></li>
+                <li><a href="createvehicle"><i class="fa fa-circle-o"></i> Vehicle</a></li>
+                <li><a href="createlocation"><i class="fa fa-circle-o"></i> Location</a></li>
               </ul>
             </li>
         <?php } ?>
         <li>
-          <a href="account.php">
-            <i class="fa fa-envelope"></i> <span>Accounts</span>
+          <a href="account">
+            <i class="fa fa-dollar"></i> <span>Accounts</span>
           </a>
         </li>
         <li class="treeview">
-          <a href="mailbox.php">
+          <a href="mailbox">
             <i class="fa fa-envelope"></i> <span>Mailbox</span>
             <span class="pull-right-container">
               <i class="fa fa-angle-left pull-right"></i>
@@ -416,18 +417,18 @@
           </a>
           <ul class="treeview-menu">
             <li class="active">
-              <a href="mailbox.php">Inbox
+              <a href="mailbox">Inbox
                 <span class="pull-right-container">
                   <span class="label label-primary pull-right"><?php echo ($newMail == 0) ? '' : $newMail; ?></span>
                 </span>
               </a>
             </li>
-            <li><a href="compose.php">Compose</a></li>
-            <li><a href="sentmail.php">Sent</a></li>
+            <li><a href="compose">Compose</a></li>
+            <li><a href="sentmail">Sent</a></li>
           </ul>
         </li>
         <li class="treeview">
-          <a href="_logout.php">
+          <a href="-logout">
             <i class="fa fa-dashboard"></i> <span>Logout</span>
           </a>
         </li>

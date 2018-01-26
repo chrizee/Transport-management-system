@@ -2,7 +2,7 @@
 	require_once 'includes/content/header.php';
   if(empty(Input::get("user"))) {
     Session::flash('home', "select a valid user.");
-    Redirect::to('viewstaff.php');
+    Redirect::to('viewstaff');
   }
   $userId = decode(Input::get('user'));
 	$success = false;
@@ -11,7 +11,7 @@
     $staff = $user->getStaffs(array('id', '=', $userId));
     if(count($staff) == 0) {
       Session::flash('home', "select a valid user.");
-      Redirect::to('viewstaff.php');
+      Redirect::to('viewstaff');
     }
     $staff = $staff[0];
   } catch (Exception $e) {

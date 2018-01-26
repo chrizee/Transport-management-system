@@ -2,7 +2,7 @@
 	require_once 'includes/content/header.php';
 	if(!$user->checkPermission(array('staff', 'manager'))) {    //only staffs and manager can see it
 	    Session::flash('home', "You don't have permission to view that page");
-	    Redirect::to('dashboard.php');
+	    Redirect::to('dashboard');
 	}
 	$delimiter = "::";
 	$vehicle = new Vehicle('vehicles');
@@ -38,7 +38,7 @@
 						'category' => Config::get('notification/request_vehicle'),
 						));
 						Session::flash('home', "Request sent successfully");
-						Redirect::to($_SERVER['PHP_SELF']);
+						Redirect::to('vehiclerequest');
 				} catch (Exception $e) {
 					print_r($e->getMessage());
 				}
@@ -125,7 +125,7 @@
 		            		<?php } ?>
 	            </div>
             <div class="box-footer">
-                <input type="submit" class="btn btn-primary" name="send_request" value="Send Request">
+              <input type="submit" class="btn btn-primary" name="send_request" value="Send Request">
             </div>
             </form>
 					</div>
@@ -237,7 +237,7 @@
 					          <p class="passengererror text-danger"></p>
 					        </div>
 					        <div class="modal-body">
-					          <form role="form" method="post" name="request" action="_vehiclerequest.php">
+					          <form role="form" method="post" name="request" action="-vehiclerequest">
 					            <input type="hidden" name="request" value="">
 					            <div class="form-group">
 				                <label>vehicle to send</label>

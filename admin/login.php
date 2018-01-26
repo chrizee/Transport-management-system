@@ -26,7 +26,8 @@
         $login = $user->login(Input::get('email'), Input::get('password'), $remember);
 
         if($login) {
-          Redirect::to('dashboard.php');
+          print_r($_POST);
+          Redirect::to('dashboard');
         } else {
           foreach ($user->errors() as $error) {
             $errors[] = $error;
@@ -85,7 +86,7 @@
   <div class="login-box-body">
     <p class="login-box-msg">Sign in to start application</p>
 
-    <form action="<?php echo $_SERVER['PHP_SELF'] ?>" method="post">
+    <form action="" method="post">
       <div class="form-group has-feedback">
         <input type="email" class="form-control" name="email" placeholder="Email" required="required" autocomplete="off" autofocus="on">
         <span class="glyphicon glyphicon-envelope form-control-feedback"></span>
@@ -111,7 +112,7 @@
       <input type="hidden" name="token" value="<?php echo Token::generate() ?>">
     </form>
 
-    <a href="forgotpassword.php">I forgot my password</a><br>
+    <a href="forgotpassword">I forgot my password</a><br>
 
   </div>
   <!-- /.login-box-body -->

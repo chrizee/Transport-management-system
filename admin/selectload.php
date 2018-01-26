@@ -2,12 +2,12 @@
 	require_once 'includes/content/header.php';
   if(!$user->checkPermission(array('staff'))) {    //only staff can see it
     Session::flash('home', "You don't have permission to view that page");
-    Redirect::to('dashboard.php');
+    Redirect::to('dashboard');
   }
 	$errors = array();
 	if(!Input::exists()) {
 		Session::flash('home', 'select the valid data to proceed');
-		Redirect::to('load.php');
+		Redirect::to('load');
 	}
 	$hash = Session::get(Config::get('session/load'));
 	$destination = Input::get('destination');
@@ -74,7 +74,7 @@
               <!-- /.box-header -->
               <div class="box-body">
                 <p class="passengererror hidden"></p>
-                <form role="form" name="travelsettings" method="post" action="addwaybill.php">
+                <form role="form" name="travelsettings" method="post" action="addwaybill">
                 	<input type="hidden" name="destination" value="<?php echo $destination; ?>">
                 	<input type="hidden" name="vehicle" value="<?php echo $vehicle[0]->id ; ?>">
                 	<input type="hidden" name="driver" value="<?php echo $driver[0]->id ; ?>">
@@ -165,7 +165,7 @@
                     <tr class="noofseats"><th>No of seats</th><td><?php echo $vehicle[0]->no_of_seats; ?></td></tr>
                     <tr class="driver"><th>Driver</th><td><?php echo $driver[0]->name ?></td></tr>
                     <tr class="destination"><th>Destination</th><td><?php echo $parkObj->get($destination, "park")->park; ?></td></tr>
-                    <tr class="vehicle"><th>Price</th><td><?php echo $vehicle[0]->plate_no; ?></td></tr>
+                    <tr class="vehicle"><th>Vehicle</th><td><?php echo $vehicle[0]->plate_no; ?></td></tr>
                   </tbody>
                 </table>  
                 <!-- /.box-body -->
@@ -209,7 +209,7 @@
       $blood_group = ($(this).parent().siblings('td').find('input[name=blood]').val() != "") ? $('input[name=blood]').val() : 'none';
       $next_of_kin = ($(this).parent().siblings('td').find('input[name=kin]').val() != "") ? $('input[name=kin]').val() : 'none';
       
-      $.post('_addpassengers.php', {
+      $.post('-addpassengers', {
         name: $name,
         phone: $phone,
         address: $address,
@@ -255,7 +255,7 @@
       $current = this;
       $('div.continue').addClass('hidden');
       //remove from database and renumber table
-      $.post('_addpassengers.php', {name: $name, hash: $hash, flag: 'D' }, function($result) {
+      $.post('-addpassengers', {name: $name, hash: $hash, flag: 'D' }, function($result) {
         if($result == '1') {
           $('span.alertme').text($name+" removed.").slideDown('fast');
           $($current).parents('tr').replaceWith(

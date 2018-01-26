@@ -2,12 +2,26 @@
 	require_once 'includes/content/header.php';
   $reply = '';
   $forward = '';
-  if(Input::get('reply')) {
-    $id = decode(Input::get('reply'));
-    $reply = $messageObj->get(array('id', '=', $id),"`from`");
-    if(empty($reply)) {
+  if($Qstring) {
+    $arr = explode('=', $Qstring);
+    if(count($arr) >= 2) {
+      $id = decode($arr[1]);
+      if($arr[0] == 'forward') {
+        $forward = $messageObj->get(array('id', '=', $id),'message');
+        if(empty($forward)) {
+          Session::flash('home', "Please select a valid mail");
+          Redirect::to('mailbox');
+        }
+      } elseif($arr[0] == 'reply') {
+        $reply = $messageObj->get(array('id', '=', $id),"`from`");
+        if(empty($reply)) {
+          Session::flash('home', "Please select a valid mail");
+          Redirect::to('mailbox');
+        }
+      } 
+    }else {
       Session::flash('home', "Please select a valid mail");
-      Redirect::to('mailbox.php');
+      Redirect::to('mailbox');
     }
   }
 
@@ -17,7 +31,7 @@
     $forward = $messageObj->get(array('id', '=', $id),'message');
     if(empty($forward)) {
       Session::flash('home', "Please select a valid mail");
-      Redirect::to('mailbox.php');
+      Redirect::to('mailbox');
     }
   }
   $errors = array();
@@ -95,7 +109,7 @@
     <section class="content">
       <div class="row">
         <div class="col-md-3">
-          <a href="mailbox.php" class="btn btn-primary btn-block margin-bottom">Back to Inbox</a>
+          <a href="mailbox" class="btn btn-primary btn-block margin-bottom">Back to Inbox</a>
 
           <div class="box box-solid">
             <div class="box-header with-border">
@@ -108,11 +122,10 @@
             </div>
             <div class="box-body no-padding">
               <ul class="nav nav-pills nav-stacked">
-                <li><a href="mailbox.php"><i class="fa fa-inbox"></i> Inbox
+                <li><a href="mailbox"><i class="fa fa-inbox"></i> Inbox
                   <span class="label label-primary pull-right"><?php echo ($newMail == 0) ? '' : $newMail ?></span></a></li>
-                <li><a href="sentmail.php"><i class="fa fa-envelope-o"></i> Sent</a></li>
-                </li>
-                <li><a href="trash.php"><i class="fa fa-trash-o"></i> Trash</a></li>
+                <li><a href="sentmail"><i class="fa fa-envelope-o"></i> Sent</a></li>
+                <li><a href="trash"><i class="fa fa-trash-o"></i> Trash <span class="label label-warning pull-right"><?php echo (count($trash) == 0) ? '' : count($trash) ?></span></a></li>
               </ul>
             </div>
             <!-- /.box-body -->

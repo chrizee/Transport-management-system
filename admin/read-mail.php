@@ -1,20 +1,20 @@
 <?php
 	require_once 'includes/content/header.php';
-  if(empty(Input::get('mail'))) {
+  if(empty($Qstring)) {
     Session::flash('home', "Please select a valid mail");
-    Redirect::to('mailbox.php');
+    Redirect::to('mailbox');
   }
-	$id = decode(Input::get('mail'));
+	$id = decode($Qstring);
   $message = $messageObj->get(array('id', '=', $id));
   if(empty($message)) {
     Session::flash('home', "Please select a valid mail");
-    Redirect::to('mailbox.php');
+    Redirect::to('mailbox');
   }
   $message = $message[0];
   //change status only when its not read and you are  not the sender
-  if($message->status == Config::get('message/not_read') && $message->from != $user->data()->id) {
+  if($message->receiver_status == Config::get('message/not_read') && $message->from != $user->data()->id) {
     try {
-      $messageObj->update($id,array('status' => Config::get('message/read')));
+      $messageObj->update($id,array('receiver_status' => Config::get('message/read')));
     } catch (Exception $e) {
       die($e->getMessage());
     }
@@ -42,7 +42,7 @@
     <section class="content">
       <div class="row">
         <div class="col-md-3">
-          <a href="compose.php" class="btn btn-primary btn-block margin-bottom">Compose</a>
+          <a href="compose" class="btn btn-primary btn-block margin-bottom">Compose</a>
 
           <div class="box box-solid">
             <div class="box-header with-border">
@@ -55,11 +55,10 @@
             </div>
             <div class="box-body no-padding">
               <ul class="nav nav-pills nav-stacked">
-                <li><a href="mailbox.php"><i class="fa fa-inbox"></i> Inbox
+                <li><a href="mailbox"><i class="fa fa-inbox"></i> Inbox
                   <span class="label label-primary pull-right"><?php echo ($newMail == 0) ? '' : $newMail ?></span></a></li>
-                <li><a href="sentmail.php"><i class="fa fa-envelope-o"></i> Sent</a></li>
-                </li>
-                <li><a href="trash.php"><i class="fa fa-trash-o"></i> Trash</a></li>
+                <li><a href="sentmail"><i class="fa fa-envelope-o"></i> Sent</a></li>
+                <li><a href="trash"><i class="fa fa-trash-o"></i> Trash</a></li>
               </ul>
             </div>
             <!-- /.box-body -->
@@ -80,7 +79,7 @@
             <!-- /.box-header -->
             <div class="box-body no-padding">
               <div class="mailbox-read-info">
-                <h3><?php echo escape($message->subject) ?></h3>
+                <h3>Subject: <?php echo escape($message->subject) ?></h3>
                 <?php if($message->recipient == $user->data()->id) {?>
                 <h5>From: <?php $staff = new User($message->from); echo $staff->data()->name;?>
                   <span class="mailbox-read-time pull-right"><?php $date = new dateTime($message->date); echo $date->format('d M. Y h:i a')?></span></h5>
@@ -92,7 +91,7 @@
               </div>
               <!-- /.mailbox-read-info -->
               <?php
-                if($message->status != Config::get('message/deleted')) {
+                if(($message->recipient == $user->data()->id && $message->receiver_status != Config::get('message/deleted')) || ($message->from == $user->data()->id && $message->sender_status != Config::get('message/deleted'))) {
               ?>
               <div class="mailbox-controls with-border text-center">
                 <div class="btn-group">
@@ -116,7 +115,7 @@
             </div>
             <!-- /.box-body -->
             <?php
-              if($message->status != Config::get('message/deleted') && $message->from != $user->data()->id) {
+              if($message->receiver_status != Config::get('message/deleted') && $message->from != $user->data()->id) {
             ?>
             <div class="box-footer">
               <div class="pull-right">
@@ -139,14 +138,15 @@
   <!-- /.content-wrapper -->
 <script>
   $(document).ready(function () {
-    var $clicked = ["<?php echo Input::get('mail') ?>"];
+    var $clicked = ["<?php echo $Qstring ?>"];
+    $who = "<?php echo ($message->from == $user->data()->id) ? 'sender' : 'receiver' ?>";
     $(document).on('click', 'button[title=Delete], button.delete', function(e) {
       if($clicked.length > 0) {
         $('p.mail-error').fadeOut();
-        $.post('_mail.php', {id: $clicked, action: 'delete'}, function($result) {
+        $.post('-mail', {id: $clicked, action: 'delete', who: $who}, function($result) {
           if($result == 1) {
             $('p.mail-error').text('Deleted').fadeOut('1000');
-            window.location = "mailbox.php";
+            window.location = "mailbox";
           }
         });
       } else { 
@@ -154,43 +154,19 @@
       }
       }).on('click', 'button[title=Reply], button.reply', function(e) {
       if($clicked.length == 1) {
-        window.location = "compose.php?reply="+$clicked[0]; 
+        window.location = "compose_reply="+$clicked[0]; 
       }else {
         e.preventDefault();
        $('p.mail-error').text('Select one message to reply'); 
       }
       }).on('click', 'button[title=Forward], button.forward', function(e) {
       if($clicked.length == 1) {
-        window.location = "compose.php?forward="+$clicked[0]; 
+        window.location = "compose_forward="+$clicked[0]; 
       }else {
         e.preventDefault();
        $('p.mail-error').text('Select one message to forward1'); 
       }
       });
-
-
-
-
-      
-    //Handle starring for glyphicon and font awesome
-    $(".mailbox-star").click(function (e) {
-      e.preventDefault();
-      //detect type
-      var $this = $(this).find("a > i");
-      var glyph = $this.hasClass("glyphicon");
-      var fa = $this.hasClass("fa");
-
-      //Switch states
-      if (glyph) {
-        $this.toggleClass("glyphicon-star");
-        $this.toggleClass("glyphicon-star-empty");
-      }
-
-      if (fa) {
-        $this.toggleClass("fa-star");
-        $this.toggleClass("fa-star-o");
-      }
-    });
   });
 </script>
 </script>

@@ -2,7 +2,7 @@
 	require_once 'includes/content/header.php';
 	if(!$user->checkPermission(array('manager', 'admin'))) {    //only ceo and manager can see it
 	    Session::flash('home', "You don't have permission to view that page");
-	    Redirect::to('dashboard.php');
+	    Redirect::to('dashboard');
 	}
 	$park = $parkObj->get();
 	$errors = array();
@@ -94,7 +94,7 @@
     <!-- Main content -->
     <section class="content">
 			<div style="display:inline-block;">
-      	<a href="viewvehicles.php"><button class="btn btn-sm btn-success pull-right">View vehicles <i class="fa fa-link"></i></button></a>
+      	<a href="viewvehicles"><button class="btn btn-sm btn-success pull-right">View vehicles <i class="fa fa-link"></i></button></a>
       </div>
       <!-- Main row -->
       <div class="row">

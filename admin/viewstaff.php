@@ -2,7 +2,7 @@
 	require_once 'includes/content/header.php';
 	if(!$user->checkPermission(array('*'))) {		//all can view
 		Session::flash('home', "You don't have permission to view that page");
-		Redirect::to('dashboard.php');
+		Redirect::to('dashboard');
 	}
 
 	$errors = array();
@@ -41,7 +41,7 @@
 			if($user->hasPermission('admin') || $user->hasPermission('manager')) {
 		?>
       <div style="display:inline-block;">
-      	<a href="createstaff.php"><button class="btn btn-success pull-right">New <i class="fa fa-plus"></i></button></a>
+      	<a href="createstaff"><button class="btn btn-success pull-right">New <i class="fa fa-plus"></i></button></a>
       </div>
 		<?php }?>
       <!-- Main row -->
@@ -243,7 +243,7 @@
 		            			if(($value->groups == Config::get('permissions/ceo') && !$user->hasPermission('admin')) || $value->id == $user->data()->id) continue; //staff cant see ceo's info and their own info
 		            	?>
 		                <tr>
-		                  <td class="name"><a href="viewprofile.php?user=<?php echo encode($value->id)?>"><?php echo $value->name ?></a></td>
+		                  <td class="name"><a href="viewprofile_<?php echo encode($value->id)?>"><?php echo $value->name ?></a></td>
 		                  <td class="email"><?php echo $value->email ?></td>
 		                  <td class="phone"><?php echo $value->phone ?></td>
 		                  <td class="location"><?php
@@ -464,7 +464,7 @@
 		$('input[name=editdriver]').click(function(e) {
 			e.preventDefault();
 			var $statusVal = $('input[name=status]:checked').val();
-			$.post('_editstaff.php', {id: driveredit.id.value, location: driveredit.dlocation.value, name: driveredit.name.value, phone: driveredit.phone.value, email: driveredit.email.value, status: $statusVal, identity: 'driver' }, function(result) {
+			$.post('-editstaff', {id: driveredit.id.value, location: driveredit.dlocation.value, name: driveredit.name.value, phone: driveredit.phone.value, email: driveredit.email.value, status: $statusVal, identity: 'driver' }, function(result) {
 				$('p.dtest').text(result);
 				$('button.close').click();
 			});
@@ -515,7 +515,7 @@
 			e.preventDefault();
 			var $statusVal = $('input[name=sstatus]:checked').val();
 			var $levelVal = $('input[name=level]:checked').val();
-			$.post('_editstaff.php', {
+			$.post('-editstaff', {
 				identity: 'staff',
 				id: staffedit.id.value,
 				name: staffedit.name.value,
@@ -549,7 +549,7 @@
 
 		$('input[name=editdriver]').click(function(e) {
 			e.preventDefault();
-			$.post('_editstaff.php', {id: driveredit.id.value, location: driveredit.dlocation.value, identity: 'driver', sender: 'staff' }, function(result) {
+			$.post('-editstaff', {id: driveredit.id.value, location: driveredit.dlocation.value, identity: 'driver', sender: 'staff' }, function(result) {
 				$('p.dtest').text(result);
 				$('button.close').click();
 			});

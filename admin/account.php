@@ -1,49 +1,55 @@
 <?php
 	require_once 'includes/content/header.php';
-	if(!$user->checkPermission(array('*'))) {    //only ceo and manager can see it
+	if(!$user->checkPermission(array('*'))) {
 	    Session::flash('home', "You don't have permission to view that page");
-	    Redirect::to('dashboard.php');
+	    Redirect::to('dashboard');
 	}
-	$delimiter = "::";
-	$vehicle = new Vehicle('vehicles');
 	$parks = $parkObj->get(null, 'id,park');
-	$success = true;
 	$errors = array();
-	if(Input::exists() && !empty(Input::get('send_request'))) {
+	if(Input::exists() && !empty(Input::get('fetch_invoice'))) {
 		$validate = new Validate();
 		$validation = $validate->check($_POST, array(
-			'no_of_vehicles' => array(
-				'required' => true,
-				'min' => 1,
-				),
-			'request_location' => array(
-				'required' => true,
+			'invoice_period' => array(
+				//'function' => 'checkDateNow',
 				),
 			));
+		$start = '';
+		$end = '';
+		if(!empty(Input::get('invoice_period')) && Input::get('period') == 'others') {
+			$period =explode('- ', Input::get('invoice_period'));
+    	$start = cleanDate($period[0]);
+    	$end = cleanDate($period[1]);
+    	if(strtotime($end) > time()) {
+    		$errors[] = "End date in range cannot be greater than now";
+    	}
+		}
 
-		if($validation->passed()) {
-			if(!$vehicle->requestCheck(Input::get('request_location'), Input::get('no_of_vehicles'))) {
-				$success = false;
-				Session::flash('home', "The amount of vehicles requested is not in the target park.Select another park to request from or reduce the number of vehicles in the request");
+		if($user->checkPermission(['admin'])) {
+			if((empty(Input::get('period')) || empty(Input::get('invoice_period'))) || (empty(Input::get('location')) && empty(Input::get('staff')))) {
+				$errors[] = "Enter a valid combination of either location or staff and period to proceed";
 			}
-			if($success){
-				try {
-					$request = new Notification();
-					$request->create(array(
-						'message' => Input::get('no_of_vehicles').$delimiter. Input::get('note'),
-						'initiated' => $user->data()->id,
-						'location_initiated' => $user->data()->location,
-						'affected' => Config::get('permissions/manager'),
-						'location_affected' => Input::get('request_location'),
-						'category' => Config::get('notification/request_vehicle'),
-						));
-						Session::flash('home', "Request sent successfully");
-						Redirect::to($_SERVER['PHP_SELF']);
-				} catch (Exception $e) {
-					print_r($e->getMessage());
-				}
+		}
+
+		if($user->checkPermission(['manager'])) {
+			if(empty(Input::get('staff')) || (empty(Input::get('period')) || empty(Input::get('invoice_period')))) {
+				$errors[] = "Enter a valid combination of staff and period to proceed";
 			}
-		} else {
+		}
+
+		if($user->checkPermission(['staff'])) {
+			if(empty(Input::get('period')) || empty(Input::get('invoice_period'))) {
+				$errors[] = "Enter a valid period to proceed";
+			}
+		}
+
+		if($validation->passed() && empty($errors)) {
+			$invoiceObj = new Invoice();
+    	try {
+    		$invoice = array_reverse($invoiceObj->getN(Input::get('period'), $user, $start, $end, Input::get('location'), Input::get('staff'),$parkObj));	
+    	} catch (Exception $e) {
+    		die($e->getMessage());
+    	}
+		}else {
 			foreach ($validation->errors() as $error) {
 				$errors[] = str_replace('_', ' ', $error);
 			}
@@ -64,7 +70,7 @@
 		    }
 		    if($errors) {
     			foreach ($errors as  $value) {
-    				echo "<p class='text text-center'>$value</p>";
+    				echo "<p class='text text-center text-danger'>$value</p>";
     			}
     		}
       ?>
@@ -82,83 +88,162 @@
         <section class="col-lg-4 connectedSortable left">
 					<div class="box box-success">
 						<div class="box-header with-border">
-              <h3 class="box-title">New Request</h3>
+              <h3 class="box-title">Sort by</h3>
             	<div class="pull-right box-tools">
-	                <button type="button" class="btn btn-info btn-sm" data-widget="collapse" data-toggle="tooltip" title="Collapse">
-	                  <i class="fa fa-minus"></i></button>
-	                <button type="button" class="btn btn-info btn-sm" data-widget="remove" data-toggle="tooltip" title="Remove">
-	                  <i class="fa fa-times"></i></button>
+                <button type="button" class="btn btn-info btn-sm" data-widget="collapse" data-toggle="tooltip" title="Collapse">
+                  <i class="fa fa-minus"></i></button>
+                <button type="button" class="btn btn-info btn-sm" data-widget="remove" data-toggle="tooltip" title="Remove">
+                  <i class="fa fa-times"></i></button>
 	            </div>
             </div>
             <div class="box-body">
+	            <form method="post" action="" role="form" id="period">
+	            	<div class="form-group">
+	                <label>View invoice for </label>
+	                <select class="form-control select2" name="period" data-placeholder="Select period" style="width: 100%;" required>
+	                  <option value="">--select--</option>
+	                  <option value="<?php echo Config::get('periods/today') ?>">Today</option>
+	                  <option value="<?php echo Config::get('periods/yesterday'); ?>">Yesterday</option>
+	                  <option value="<?php echo Config::get('periods/this_week'); ?>">This week</option>
+	                  <option value="<?php echo Config::get('periods/last_week') ?>">Last week</option>
+	                  <option value="<?php echo Config::get('periods/this_month'); ?>">This Month</option>
+	                  <option value="<?php echo Config::get('periods/last_month'); ?>">Last Month</option>
+	                  <option value="others">others...</option>
+	                </select>
+	            	</div>
 
+	            	<div class="input-group range hidden" >
+	            		<label for="date">Select range of period</label>
+	                <input type="text" name="invoice_period" id="date" class="form-control" value="<?php echo escape(Input::get('invoice_period'))?>">
+		            </div>
+
+	            	<?php if($user->checkPermission(['admin'])) {?>
+	            		 	<div class="form-group">
+			                <label>View by location</label>
+			                <select class="form-control select2" name="location" data-placeholder="Select a Park" style="width: 100%;" required>
+			                	<option value="">--select--</option>
+			                	<option value="*" selected>all</option>
+			                <?php
+			                  	foreach ($parks as $value) {
+			                  		if($value->id == $user->data()->location) continue; ?>
+			                  		<option value="<?php echo $value->id; ?>"><?php echo $value->park; ?></option>
+		                  	<?php } ?>
+			                </select>
+			            	</div>
+	            	<?php } ?>
+
+	            	<?php if($user->checkPermission(['manager','admin'])) {
+	            		$staffs = $user->getStaffs(array('id', '!=', $user->data()->id, 'groups', '=', Config::get('permissions/loading_officer')));
+	            		if($staffs) {
+	            		?>
+	            		 	<div class="form-group">
+			                <label>Select to view invoice by a particular staff</label>
+			                <select class="form-control select2" name="staff" data-placeholder="Select a staff" style="width: 100%;">
+			                	<option value="">--select--</option>
+			                <?php
+			                  	foreach ($staffs as $value) {
+			                  		if($user->hasPermission('manager') && $value->location != $user->data()->location) continue; ?>
+			                  		<option value="<?php echo $value->id; ?>"><?php echo $value->name; ?></option>
+		                  	<?php } ?>
+			                </select>
+			            	</div>
+	            	<?php } }?>
+	            	
+	            </form>
 	          </div>
             <div class="box-footer">
-
+            	<input type="submit" form="period" class="btn btn-sm btn-primary" name="fetch_invoice" value="Fetch Invoice">
             </div>
 					</div>
         </section>
+        <?php 
+        	if(Input::exists() && !empty(Input::get('fetch_invoice')) && isset($invoice)) {
+        ?>
         <section class="col-lg-8 connectedSortable">
         	<div class="box box-success">
 						<div class="box-header with-border">
-              <h3 class="box-title">Vehicle stats in parks(only good vehicles are shown here)</h3>
-              <?php if(!$user->hasPermission('manager')) { ?>
+              <h3 class="box-title"><?php echo $invoiceObj->message; ?></h3>
             	<div class="pull-right box-tools">
 	                <button type="button" class="btn btn-info btn-sm" data-widget="collapse" data-toggle="tooltip" title="Collapse">
 	                  <i class="fa fa-minus"></i></button>
 	                <button type="button" class="btn btn-info btn-sm" data-widget="remove" data-toggle="tooltip" title="Remove">
 	                  <i class="fa fa-times"></i></button>
 	            </div>
-	            <?php } ?>
             </div>
             <div class="box-body">
-            	<?php
-            		$disabled = array();
-
-            		foreach ($parks as $key => $value) {
-            			//if($value->id == $user->data()->location) continue;
-            			$vehicles = $vehicle->get(array('current_location', '=', $value->id, 'status', '=', Config::get('status/good')));
+            	<?php if(!empty($invoice) && isset($invoice[0]->amount)) { ?>
+            	<table class="table table-condensed">
+            		<thead>
+            			<tr>
+            				<th>Date</th>
+            				<?php if($user->checkPermission(['admin','manager'])) {?>
+            				<th>Raised by</th>
+            				<?php } ?>
+            				<th>source</th>
+            				<th>Destination</th>
+            				<th>Amount (N)</th>
+            			</tr>
+            		</thead>
+            		<tbody>
+            			<?php $total = 0;
+            				foreach ($invoice as $key => $value) {
+            					$total += $value->amount;
+            					?>
+            					<tr>
+            					<td><?php echo (new dateTime($value->date))->format('d-M-Y h:i a');?></td>
+            				<?php if($user->checkPermission(['admin','manager'])) {?>
+            					<td><?php echo $user->getStaffs(array('id', '=', $value->user))[0]->name;?></td>
+            				<?php } ?>
+            					<td><?php echo $parkObj->get($value->source, 'park')->park;?></td>
+            					<td><?php echo $parkObj->get($value->destination, 'park')->park;?></td>
+            					<td><?php echo $value->amount;?></td>
+            					</tr>
+            				<?php }
             			?>
-            		<h3><?php echo $value->park; ?></h3>
-            		<?php if(!empty($vehicles)) {?>
-            			<table class="table table-condensed">
-	            			<thead>
-	            				<tr>
-	            					<th>Vehicle</th>
-	            					<th>seats</th>
-	            					<th>AC</th>
-	            				</tr>
-	            			</thead>
-	            			<tbody>
-            				<?php foreach ($vehicles as $key => $value) {?>
-            				<tr>
-            					<td><?php echo $value->plate_no?></td>
-            					<td><?php echo $value->no_of_seats?></td>
-            					<td><?php echo ($value->ac == 1) ? 'Yes' : "No" ?></td>
-            				</tr>
-
-            		<?php }?>
-	            		</tbody>
-	            			</table>
-	            	<?php }else{
-	            		$disabled[] = $value->id;
-	            		?>
-            			<p>No Vehicle in <?php echo $value->park; ?></p>
-            		<?php } }  $disabled = json_encode($disabled);
-            	?>
+            		</tbody>
+            		<tfoot>
+            			<tr>
+            				<td>Total (N):</td>
+            				<td><?php echo $total;?></td>
+            			</tr>
+            		</tfoot>
+            	</table>
+            	<?php } else{ ?>
+            		<p>No result for your query</p>
+            	<?php } ?>
             </div>
 					</div>
         </section>
-
+        <?php } ?>
       </div>
       <!-- /.row (main row) -->
     </section>
     <!-- /.content -->
   </div>
   <!-- /.content-wrapper -->
+  <!-- daterangepicker -->
+<script src="plugins/daterangepicker/moment.min.js"></script>
+<script src="plugins/daterangepicker/daterangepicker.js"></script>
 <script type="text/javascript">
 	$(document).ready(function() {
+		$('section.left').on('change', 'select[name=period]', function() {
+			$(this).attr('required');
+			$('div.range').slideUp('slow');
+			$('input[name=invoice_period]').removeAttr('required', 'required');
+			if($(this).val() == 'others') {
+				$(this).removeAttr('required');
+				$('div.range').removeClass('hidden').slideDown('slow');
+				$('input[name=invoice_period]').attr('required', 'required');
+			}
+		});
 
+		$("input[name='invoice_period']").daterangepicker({
+        timePicker: true,
+        timePickerIncrement: 1,
+        locale: {
+            format: 'MM/DD/YYYY h:mm A'
+        }
+    });
 	})
 
 </script>

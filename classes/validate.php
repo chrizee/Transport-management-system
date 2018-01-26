@@ -129,6 +129,14 @@ class Validate {
 		}
 	}
 
+	private function checkDateAgainstNow($date) {
+		self::checkDate($date);
+		$now = new dateTime();
+		$entered = new dateTime($date);
+		if($now > $entered) {
+			$this->addError("Date must be in the past");
+		}
+	}
 	//validation method for pictures.
 	public function checkPic($pic) {		
 		if ($_FILES[$pic]["error"] == UPLOAD_ERR_OK and !empty($_FILES[$pic]) ) {

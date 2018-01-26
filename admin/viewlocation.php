@@ -2,7 +2,7 @@
 	require_once 'includes/content/header.php';
 	if(!$user->checkPermission(array('*'))) {    //all can see it
 	    Session::flash('home', "You don't have permission to view that page");
-	    Redirect::to('dashboard.php');
+	    Redirect::to('dashboard');
 	}
 	$errors = array();
 	$park = $parkObj->get();
@@ -38,7 +38,7 @@
     		if($user->hasPermission('admin') || $user->hasPermission('manager')) {
     	?>
       <div style="display:inline-block;">
-      	<a href="createlocation.php"><button class="btn btn-sm btn-success pull-right">New <i class="fa fa-plus"></i></button></a>
+      	<a href="createlocation"><button class="btn btn-sm btn-success pull-right">New <i class="fa fa-plus"></i></button></a>
       </div>
       <?php } ?>
       <!-- Main row -->
@@ -76,7 +76,7 @@
 		                  <td><?php echo $value->park ?></td>
 		                  <td><?php $date = new DateTime($value->date_created); echo $date->format('d-M-Y');  ?></td>
 		                  <td>
-		                  	<a href="viewlocation.php?park=<?php echo encode($value->id) ?>">
+		                  	<a href="viewlocation_<?php echo encode($value->id) ?>">
 		                  		<button class="btn btn-info">View <i class="fa  fa-angle-double-right"></i></button>
 		                  	</a>
 		                  </td>
@@ -94,8 +94,8 @@
         <!-- right col (We are only adding the ID to make the widgets sortable)-->
         <section class="col-lg-8 connectedSortable">
       	 <?php
-      	 	if(!empty(Input::get('park'))) {
-      	 		$parkid = decode(Input::get('park'));
+      	 	if(!empty($Qstring)) {
+      	 		$parkid = decode($Qstring);
       	 		$go = false;
       	 		foreach ($park as $key => $value) {
       	 			if($parkid == $value->id) $go = true;
@@ -298,7 +298,7 @@
 			var $destination = $("input[name=fdestination"+name+"]").val();
 			var $price = $("input[name=fprice"+name+"]").val();
 			var $duration = $("input[name=fduration"+name+"]").val();
-			$.post('_addroute.php', {source: $source, destination: $destination, price: $price, duration: $duration }, function($return) {
+			$.post('-addroute', {source: $source, destination: $destination, price: $price, duration: $duration }, function($return) {
 				Success($return, name, 'nforward')
 			});
 		});
@@ -309,7 +309,7 @@
 			var $destination = $("input[name=rdestination"+name+"]").val();
 			var $price = $("input[name=rprice"+name+"]").val();
 			var $duration = $("input[name=rduration"+name+"]").val();
-			$.post('_addroute.php', {source: $source, destination: $destination, price: $price, duration: $duration }, function($return) {
+			$.post('-addroute', {source: $source, destination: $destination, price: $price, duration: $duration }, function($return) {
 				Success($return,name, 'nreverse');
 			});
 		});
@@ -320,7 +320,7 @@
 			var $price = $("input[name=fprice"+name+"]").val();
 			var $duration = $("input[name=fduration"+name+"]").val();
 			var $id = $("input[name=fid"+name+"]").val();
-			$.post('_addroute.php', {id: $id, price: $price, duration: $duration }, function($return) {
+			$.post('-addroute', {id: $id, price: $price, duration: $duration }, function($return) {
 				Success($return, name, 'uforward');
 			});
 		});
@@ -332,7 +332,7 @@
 			var $price = $("input[name=rprice"+name+"]").val();
 			var $duration = $("input[name=rduration"+name+"]").val();
 			var $id = $("input[name=rid"+name+"]").val();
-			$.post('_addroute.php', {id: $id, price: $price, duration: $duration }, function($return) {
+			$.post('-addroute', {id: $id, price: $price, duration: $duration }, function($return) {
 				Success($return, name, 'ureverse');
 			});
 		});

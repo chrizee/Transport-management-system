@@ -2,12 +2,12 @@
 	require_once 'includes/content/header.php';
 	if(!$user->checkPermission(array('staff'))) {    //only staff can see it
 	    Session::flash('home', "You don't have permission to view that page");
-	    Redirect::to('dashboard.php');
+	    Redirect::to('dashboard');
 	}
 	$errors = array();
 	if(!Session::exists(Config::get('session/load')) || !Input::exists()) {
 		Session::flash('home', "Can't come here without allowing sessions");
-		Redirect::to('load.php');
+		Redirect::to('load');
 	}
 	$session = Session::get(Config::get('session/load'));
 	$destination = Input::get('destination');
@@ -73,7 +73,7 @@
 		            </div>
 	            </div>
 	            <div class="box-body">
-	            	<form method="post" action="confirmtrip.php" role="form" id="tripgo">
+	            	<form method="post" action="confirmtrip" role="form" id="tripgo">
             			<input type="hidden" name="total_weight" />
             			<input type="hidden" name="destination" value="<?php echo $destination; ?>" />
             			<input type="hidden" name="priceF" value="<?php echo Input::get('priceF'); ?>" />

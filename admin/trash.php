@@ -24,7 +24,7 @@
     <section class="content">
       <div class="row">
         <div class="col-md-3">
-          <a href="compose.php" class="btn btn-primary btn-block margin-bottom">Compose</a>
+          <a href="compose" class="btn btn-primary btn-block margin-bottom">Compose</a>
 
           <div class="box box-solid">
             <div class="box-header with-border">
@@ -37,11 +37,10 @@
             </div>
             <div class="box-body no-padding">
               <ul class="nav nav-pills nav-stacked">
-                <li><a href="mailbox.php"><i class="fa fa-inbox"></i> Inbox
+                <li><a href="mailbox"><i class="fa fa-inbox"></i> Inbox
                   <span class="label label-primary pull-right"><?php echo ($newMail == 0) ? '' : $newMail ?></span></a></li>
-                <li><a href="sentmail.php"><i class="fa fa-envelope-o"></i> Sent</a></li>
-                </li>
-                <li class="active"><a href="trash.php"><i class="fa fa-trash-o"></i> Trash <span class="label label-warning pull-right"><?php echo (count($trash) == 0) ? '' : count($trash) ?></span></a></li>
+                <li><a href="sentmail"><i class="fa fa-envelope-o"></i> Sent</a></li>
+                <li class="active"><a href="trash"><i class="fa fa-trash-o"></i> Trash <span class="label label-warning pull-right"><?php echo (count($trash) == 0) ? '' : count($trash) ?></span></a></li>
               </ul>
             </div>
             <!-- /.box-body -->
@@ -64,10 +63,10 @@
                 <button type="button" title="mark all" class="btn btn-default btn-sm checkbox-toggle"><i class="fa fa-square-o"></i>
                 </button>
                 <div class="btn-group">
-                  <button type="button" title="restore back to inbox" class="btn btn-default btn-sm"><i class="fa fa-reply"></i></button>
+                  <button type="button" title="restore back to original folder" class="btn btn-default btn-sm"><i class="fa fa-reply"></i></button>
                 </div>
                 <!-- /.btn-group -->
-                <a href="<?php echo $_SERVER['PHP_SELF']; ?>"><button type="button" title="refresh" class="btn btn-default btn-sm"><i class="fa fa-refresh"></i></button></a>
+                <a href="trash"><button type="button" title="refresh" class="btn btn-default btn-sm"><i class="fa fa-refresh"></i></button></a>
                 <p class="mail-error text-center text-danger"></p>
                 <!--<div class="pull-right">
                   1-50/200
@@ -94,10 +93,10 @@
                     ?>
                   <tr>
                     <td><input type="checkbox" name="markedMails[]" value="<?php echo encode($value->id)?>"></td>
-                    <td class="mailbox-name"><a href="read-mail.php?mail=<?php echo encode($value->id);?>"><?php $sender = new User($value->from); echo $sender->data()->name;?></a></td>
-                    <td class="mailbox-subject"><a class="<?php echo ($value->status == Config::get('message/not_read')) ?'text-success' : 'text-default text-sm';?>" href="read-mail.php?mail=<?php echo encode($value->id);?>"><b><?php echo $value->subject ?></b> - <?php echo substr(strip_tags($value->message),0,30) . "..."; ?>
+                    <td class="mailbox-name"><a href="read-mail_<?php echo encode($value->id);?>"><?php if($value->from != $user->data()->id) {$sender = new User($value->from); echo $sender->data()->name;}else{ echo "You";}?></a></td>
+                    <td class="mailbox-subject"><a class="<?php echo ($value->status == Config::get('message/not_read')) ?'text-success' : 'text-default text-sm';?>" href="read-mail_<?php echo encode($value->id);?>"><b><?php echo $value->subject ?></b> - <?php echo substr(strip_tags($value->message),0,30) . "..."; ?>
                     </td></a>
-                    <td class="mailbox-date"><a href="read-mail.php?mail=<?php echo encode($value->id);?>"><?php echo $messageObj->date($value->date)." ago"; ?></td>
+                    <td class="mailbox-date"><a href="read-mail_<?php echo encode($value->id);?>"><?php echo $messageObj->date($value->date)." ago"; ?></td>
                   </tr>
                 <?php }?>
 
@@ -114,10 +113,10 @@
                 <button type="button" title="mark all" class="btn btn-default btn-sm checkbox-toggle"><i class="fa fa-square-o"></i>
                 </button>
                 <div class="btn-group">
-                  <button type="button" title="restore back to inbox" class="btn btn-default btn-sm"><i class="fa fa-reply"></i></button>
+                  <button type="button" title="restore back to original folder" class="btn btn-default btn-sm"><i class="fa fa-reply"></i></button>
                 </div>
                 <!-- /.btn-group -->
-                <a href="<?php echo $_SERVER['PHP_SELF']; ?>"><button type="button" title="refresh" class="btn btn-default btn-sm"><i class="fa fa-refresh"></i></button></a>
+                <a href="trash"><button type="button" title="refresh" class="btn btn-default btn-sm"><i class="fa fa-refresh"></i></button></a>
                 <!--<div class="pull-right">
                   1-50/200
                   <div class="btn-group">
@@ -173,7 +172,7 @@
       });
       if($clicked.length > 0) {
         $('p.mail-error').fadeOut();
-        $.post('_mail.php', {id: $clicked, action: 'restore'}, function($result) {
+        $.post('-mail', {id: $clicked, action: 'restore', user: <?php echo $user->data()->id ?>}, function($result) {
           if($result == 1) {
             $('p.mail-error').text('Moved back to inbox').fadeOut('1000');
             $('input[name^=markedMails]').filter(':checked').each(function(i,val) {

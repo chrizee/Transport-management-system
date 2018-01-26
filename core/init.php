@@ -80,6 +80,14 @@ $GLOBALS['config'] = array(
 		'price_update' => 8,
 
 	),
+	'periods' => array(
+		'today' => 1,
+		'yesterday' => 2,
+		'this_week' => 3,
+		'last_week' => 4,
+		'this_month' => 5,
+		'last_month' => 6,
+		)
 );
 
 spl_autoload_register(function($class) {

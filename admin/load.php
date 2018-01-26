@@ -2,7 +2,7 @@
 	require_once 'includes/content/header.php';
   if(!$user->checkPermission(array('staff'))) {    //only staff can see it
     Session::flash('home', "You don't have permission to view that page");
-    Redirect::to('dashboard.php');
+    Redirect::to('dashboard');
   }
   $parkGet = $parkObj->get();
 	$vehicleObj = new Vehicle('vehicles');
@@ -52,7 +52,7 @@
                     <i class="fa fa-times"></i></button>
               </div>
             </div>
-            <form role="form" name="travelsettings" method="post" action="addwaybill.php">
+            <form role="form" name="travelsettings" method="post" action="addwaybill">
             <div class="box-body">
               <?php
                 if(!empty($parkGet)) {
@@ -86,7 +86,7 @@
               </div>
              <?php } else {?>
               <p>No vehicle in park currently.</p>
-              <a href="vehiclerequest.php"><span class="btn btn-primary">Request for Vehicle</span></a>
+              <a href="vehiclerequest"><span class="btn btn-primary">Request for Vehicle</span></a>
               <?php }
               if(!empty($drivers)) {
             ?>
@@ -247,7 +247,7 @@
     function runPost() {
       $pre = $('select[name=vehicle]').val();
       $text = $('select[name=vehicle] option:selected').text().trim();
-      $.post('_realtimestatus.php', {vehicle: 1, location: $source}, function($result) {
+      $.post('-realtimestatus', {vehicle: 1, location: $source}, function($result) {
         $('select[name=vehicle] option:first-child').siblings().remove();
         $(JSON.parse($result)).each(function () {
           $('select[name=vehicle]').append(
@@ -278,7 +278,7 @@
       $('h3.passengertitle').text("Passengers to "+ $('select[name=destination] option:selected').text());
       $destination = $(this).val();
       if($destination != '') {
-        $.post('_getprice.php', {source: $source, destination: $destination, hash: $hash }, function($result) {
+        $.post('-getprice', {source: $source, destination: $destination, hash: $hash }, function($result) {
           $parse = JSON.parse($result);
           $price = $parse.price;
           $ticket += parseInt($parse.trip);
@@ -334,7 +334,7 @@
       $old = $(this).data('pre');
       $(this).blur();   //blur the button to make it get old value when focus is received
       $new = $(this).val();
-      $.post('_updatestatus.php', {old: $old, new: $new, driver: 1}, function($result) {
+      $.post('-updatestatus', {old: $old, new: $new, driver: 1}, function($result) {
       });
       if($(this).val() != '') {
         appendToStatus('Driver', $('select[name=driver] option:selected').text());
@@ -350,14 +350,14 @@
       $old = $(this).data('pre');
       $(this).blur();   //blur the button to make it get old value when focus is received
       $new = $(this).val();
-      $.post('_updatestatus.php', {old: $old, new: $new, vehicle: 1}, function($result) {
+      $.post('-updatestatus', {old: $old, new: $new, vehicle: 1}, function($result) {
       });
 
       $vehicleId = $(this).val();
       $('div.continue').addClass('hidden');
       if($vehicleId != '') {
         appendToStatus('Vehicle', $('select[name=vehicle] option:selected').text());
-        $.post('_getprice.php', {vehicleid: $vehicleId}, function($result) {
+        $.post('-getprice', {vehicleid: $vehicleId}, function($result) {
           result = JSON.parse($result);
           $noOfSeats = result.no_of_seats;
           $ac = (result.ac == '1') ? "Yes" : "No";
@@ -396,7 +396,7 @@
       $current = this;
       $('div.continue').addClass('hidden');
       //remove from database and renumber table
-      $.post('_addpassengers.php', {name: $name, hash: $hash, flag: 'D' }, function($result) {
+      $.post('-addpassengers', {name: $name, hash: $hash, flag: 'D' }, function($result) {
         if($result == '1') {
           $('span.alertme').text($name+" removed.").slideDown('fast');
           $($current).parents('tr').remove();
@@ -442,7 +442,7 @@
       $address = ($('input[name=address]').val() != "") ? $('input[name=address]').val() : 'none';
       $blood_group = ($('input[name=blood]').val() != "") ? $('input[name=blood]').val() : 'none';
       $next_of_kin = ($('input[name=kin]').val() != "") ? $('input[name=kin]').val() : 'none';
-      $.post('_addpassengers.php', {
+      $.post('-addpassengers', {
         name: $name,
         phone: $phone,
         address: $address,
@@ -494,7 +494,7 @@
       });
       if($pass === true) {
         $('select[name=vehicle], select[name=driver], select[name=destination]').css('borderColor','green');
-        $('form[name=travelsettings').submit();
+        $('form[name=travelsettings]').submit();
       }
     });
 
@@ -522,7 +522,7 @@
       }
       if($pass === true) {
         $('select[name=vehicle], select[name=driver], select[name=destination]').css('borderColor','green');
-        $('form[name=travelsettings]').attr('action', 'selectload.php');
+        $('form[name=travelsettings]').attr('action', 'selectload');
         $('form[name=travelsettings').submit();
       }
     });

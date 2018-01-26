@@ -2,7 +2,7 @@
 	require_once 'includes/content/header.php';
 	if(!$user->checkPermission(array('*'))) {    //all can see it
 	    Session::flash('home', "You don't have permission to view that page");
-	    Redirect::to('dashboard.php');
+	    Redirect::to('dashboard');
 	}
 	$errors = array();
 	$vehicle = new Vehicle('vehicles');
@@ -48,7 +48,7 @@
 					'current_location' => Input::get('location'),
 					));
 					Session::flash('home', "Vehicle updated successfully");
-					Redirect::to($_SERVER['PHP_SELF']);
+					Redirect::to('viewvehicles');
 			} catch (Exception $e) {
 				print_r($e->getMessage());
 			}
@@ -89,7 +89,7 @@
 		if($user->hasPermission('admin') || $user->hasPermission('manager')) {
 	?>
       <div style="display:inline-block;">
-      	<a href="createvehicle.php"><button class="btn btn-success pull-right">New <i class="fa fa-plus"></i></button></a>
+      	<a href="createvehicle"><button class="btn btn-success pull-right">New <i class="fa fa-plus"></i></button></a>
       </div>
     <?php } ?>
       <!-- Main row -->
@@ -131,7 +131,7 @@
 		            	?>
 		                <tr>
 		                	<?php if($user->hasPermission('admin') || $user->hasPermission('manager')) {?>
-		                  <td class="plate_no" title="view complete details and history of maintenance"><a href="vehicle.php?vehicle=<?php echo encode($value->id)?>"><?php echo $value->plate_no ?></a></td>
+		                  <td class="plate_no" title="view complete details and history of maintenance"><a href="vehicle_<?php echo encode($value->id)?>"><?php echo $value->plate_no ?></a></td>
 		                  <?php } else {?>
 		                  	<td class="plate_no"><?php echo $value->plate_no ?></td>
 		                  	<?php } ?>

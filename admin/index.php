@@ -13,7 +13,7 @@
 	$route->add('/-logout');
 	$route->add('/-mail');
 	$route->add('/-realtimestatus');
-	$route->add('/-updateStatus');
+	$route->add('/-updatestatus');
 	$route->add('/-vehiclerequest');
 	$route->add('/account');
 	$route->add('/addwaybill');

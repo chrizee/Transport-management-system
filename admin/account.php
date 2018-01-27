@@ -124,8 +124,7 @@
 			                	<option value="">--select--</option>
 			                	<option value="*" selected>all</option>
 			                <?php
-			                  	foreach ($parks as $value) {
-			                  		if($value->id == $user->data()->location) continue; ?>
+			                  	foreach ($parks as $value) { ?>
 			                  		<option value="<?php echo $value->id; ?>"><?php echo $value->park; ?></option>
 		                  	<?php } ?>
 			                </select>
